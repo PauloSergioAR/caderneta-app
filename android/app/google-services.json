@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "32417915341",
+    "firebase_url": "https://caderneta-eletronica.firebaseio.com",
+    "project_id": "caderneta-eletronica",
+    "storage_bucket": "caderneta-eletronica.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32417915341:android:87c4c947996c821755a484",
+        "android_client_info": {
+          "package_name": "com.sw.caderneta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32417915341-n46vgd7gnk9ni5np9oecqp2hmup9s235.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6tcpbflvGJ8IcL-36ONLeEAMsIX6418I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32417915341-n46vgd7gnk9ni5np9oecqp2hmup9s235.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
