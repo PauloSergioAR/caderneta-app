@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { StyleSheet, Platform, Image, Text, View, ActivityIndicator, FlatList, Dimensions, Picker } from 'react-native'
 import firebase from 'react-native-firebase';
 import { ListItem, Overlay, Button, Input } from 'react-native-elements';
@@ -14,18 +14,35 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Main extends React.Component {
+  static navigationOptions = {
+    title: 'Home',
+    headerLeft: () => (
+      <Button
+        onPress={() => firebase.auth().signOut()}
+        icon={{ type: 'simple-line-icon', name: 'logout' }}
+      />
+    ),
+    headerRight: () => (
+      <Button
+        onPress={() => console.log("Searched")}
+        icon={{ type: 'material-community', name: 'account-search' }}
+      />
+    )
+  }
+
   constructor(props) {
     super(props)
     this.state = {
       currentUser: null,
-      data: new Date().getDate,
       visible: false,
       name: '',
-      description: '',              
+      description: '',
       expire: '',
       selectedValue: '0',
-      dateChanged: false
+      dateChanged: false,
+      dados: null
     }
+
     this.ref = firebase.firestore().collection('users')
     this.ref.where('email', "==", firebase.auth().currentUser.email).get().then(snap => {
       snap.forEach(doc => {
@@ -33,23 +50,36 @@ export default class Main extends React.Component {
       })
     })
     this.update = this.update.bind(this)
+    this.searchCallback = this.searchCallback.bind(this)
+
+    this.interval = setInterval(() =>{
+      this.update()
+      console.log("Fall here")
+    }, 60000)
   }
 
+  searchCallback(text) {
+    console.log("searched: ", text)
+  }
 
   componentDidMount() {
     const { currentUser } = firebase.auth()
     this.setState({ currentUser })
     this.update()
+
   }
 
   update = () => {
+    
+    console.log("Updating")
     let data
     firebase.firestore().collection('users')
       .where("email", "==", firebase.auth().currentUser.email).get().then((snap) => {
         snap.forEach((doc) => {
           data = doc.data()
+
           this.setState({
-            data: data
+            dados: data
           })
         })
       })
@@ -63,7 +93,6 @@ export default class Main extends React.Component {
         bottomDivider
       />
     )
-
   }
 
   close() {
@@ -80,16 +109,15 @@ export default class Main extends React.Component {
 
   handleComboboxChangeOption(val) {
     if (val !== '0') {
-      this.setState({selectedValue: val});
+      this.setState({ selectedValue: val });
     }
   }
 
-  modalCallback(data){
-    console.log(data)
+  modalCallback(data) {
     this.setState({
       visible: false
     })
-    if(!this.userRef.data().debitos){
+    if (!this.userRef.data().debitos) {
       let debArray = []
       debArray.push(data)
       this.userRef.ref.update({
@@ -97,10 +125,10 @@ export default class Main extends React.Component {
       }).then(() => {
         console.log("Added successfully")
         this.update()
-    })
-      .catch(e => console.log("ERROR: ", e))      
-    } else{
-      let debArray = [ ]
+      })
+        .catch(e => console.log("ERROR: ", e))
+    } else {
+      let debArray = []
       debArray = this.userRef.data().debitos
       debArray.push(data)
       this.userRef.ref.update({
@@ -109,42 +137,54 @@ export default class Main extends React.Component {
         console.log("Added successfully")
         this.update()
       })
-      .catch(e => console.log("ERROR: ", e))
+        .catch(e => console.log("ERROR: ", e))
     }
   }
 
   render() {
     const { currentUser } = this.state
+    let view
+    if (this.state.dados) {
+      let value = 0;
+      this.state.dados.debitos.forEach((item) => {
+        console.log(value)
+        value = value + parseFloat(item.valor)
+      })
 
-    let list = this.state.data ?
-      <FlatList
-        data={this.state.data.debitos}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={this.renderItem}
-      />
-      : <ActivityIndicator size="large" />
+      view =
+        <> 
+          <View style={styles.top}>
+            <OverlayComponent
+              callback={this.modalCallback.bind(this)}
+              visible={this.state.visible}
+            />
+            <View style={styles.container}>
+              <Text>Balanço</Text>
+              <Text style={value > 0 ? styles.positive : styles.negative}>              
+                R$ {value}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.listContainer}>
+            
+            <FlatList
+                data={this.state.dados.debitos}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={this.renderItem}
+                style={{flexGrow: 0, height: height * .80}}              
+              />
+          </View>
+        </>
+    } else {
+      view = 
+        <>
+          <ActivityIndicator size="large" />
+        </>
+    }    
 
     return (
       <View style={styles.master}>
-        <OverlayComponent 
-          callback={this.modalCallback.bind(this)}
-          visible={this.state.visible}    
-        />
-        <View style={styles.container}>
-          <Text>
-            Hi {currentUser && currentUser.email}!
-          </Text>
-        </View>
-        <View style={styles.listContainer}>
-          <Button onPress={this.open.bind(this)} 
-            icon={{
-              type: 'font-awesome', 
-              name: 'plus-circle',
-              color: "blue"
-            }}
-          />
-          {list}
-        </View>
+        {view}
       </View>
     )
   }
@@ -153,12 +193,16 @@ const styles = StyleSheet.create({
   master: {
     flex: 1,
     alignSelf: 'center',
-    flexDirection: 'column'
+    flexDirection: 'column',    
+  },
+  top: {
+    height: height * .15
   },
   container: {
     flex: 1,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     alignItems: 'center',
+    marginTop: 40
   },
 
   listContainer: {
@@ -166,5 +210,17 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'column-reverse',
     width: width * .95,
+    height: 5000,
+    
+  },
+  positive:{
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: 'green'
+  },
+  negative: {
+    fontSize: 40,    
+    fontWeight: 'bold',
+    color:'red'
   }
 })

@@ -47,7 +47,7 @@ const OverlayComponent = (props) => {
       date: date,
       tipo: combo,
       categoria: categoria,
-      valor: valor
+      valor: parseFloat(valor)
     }
     props.callback(data)
     data = null
