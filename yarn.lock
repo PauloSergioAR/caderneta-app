@@ -5425,7 +5425,7 @@ prompts@^2.0.1:
     kleur "^3.0.2"
     sisteransi "^1.0.0"
 
-prop-types@^15.5.10, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -5586,6 +5586,13 @@ react-native-elements@^1.2.6:
     prop-types "^15.7.2"
     react-native-ratings "^6.3.0"
     react-native-status-bar-height "^2.2.0"
+
+react-native-enhanced-popup-menu@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-enhanced-popup-menu/-/react-native-enhanced-popup-menu-0.6.1.tgz#70ec722f1f5934ee7985a152302e32dd15df05ba"
+  integrity sha512-NGSy24mtyKXe3h6P4D56dhvizRJ4HJlpY1G6bFWeSg7Gr1oGIUunzkY5qzgobTXbRXWJOXwjI+j7LGDD9pu09w==
+  dependencies:
+    prop-types "^15.6.0"
 
 react-native-firebase@^5.5.6:
   version "5.5.6"

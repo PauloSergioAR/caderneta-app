@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 
-import { View, Switch, Dimensions, Picker } from 'react-native';
+import { View, Switch, Dimensions, Picker, StyleSheet } from 'react-native';
 
 import { ListItem, Overlay, Button, Input } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
@@ -13,11 +13,16 @@ var height = Dimensions.get('window').height;
 var data={ }
 
 const OverlayComponent = (props) => {  
+  const [nome, setNome] = useState('')
   const [descricao, setDescricao] = useState('')
   const [date, setDate] = useState(new Date().getDate())
   const [combo, setCombo] = useState('0')
   const [categoria, setCategoria] = useState('')
   const [valor, setValor] = useState('')
+
+  onNomeChange = useCallback(e => {
+    setNome(e)
+  })
 
   const onDescChange = useCallback(e => {
     setDescricao(e)
@@ -41,8 +46,14 @@ const OverlayComponent = (props) => {
     setValor(e)
   })
 
+  const handleCancel = () => {
+    props.callback(null)
+
+  }
+
   const handleSubmit = () => {
     let data = {
+      nome:nome,
       descricao: descricao,
       date: date,
       tipo: combo,
@@ -51,6 +62,7 @@ const OverlayComponent = (props) => {
     }
     props.callback(data)
     data = null
+    setNome('')
     setCategoria('')
     setCombo('0')
     setDate(new Date().getDate())
@@ -63,14 +75,20 @@ const OverlayComponent = (props) => {
       <Overlay
           isVisible={props.visible}
           width={width * .8}
-          height={height * .8}
+          height={height * .55}
         >
           <Input
+            placeholder="nome"
+            onChangeText={(text) => onNomeChange(text)}
+            style={{padding: 10}}
+          />
+          <Input
             placeholder="Descrição"
-            onChangeText={(text) => onDescChange(text)}            
+            onChangeText={(text) => onDescChange(text)}
+            style={{padding: 10}}
           />
           <DatePicker
-            style={{width: width * .73}}
+            style={{width: width * .73, padding: 10}}
             date={data.date}
             mode="date"
             placeholder={data.date}
@@ -93,6 +111,7 @@ const OverlayComponent = (props) => {
           <Picker
             selectedValue={combo}
             onValueChange={onComboChange}
+            style={{padding: 10}}
           >
             <Picker.Item label="..." value='0'/>
             <Picker.Item label="A Pagar" value="pagar"/>
@@ -101,17 +120,42 @@ const OverlayComponent = (props) => {
           <Input
             placeholder="Categoria"
             onChangeText={(text) => onCatChange(text)}            
+            style={{padding: 10}}
           />          
           <Input
             placeholder="Valor"
             onChangeText={(text) => onValChange(text)}
             name="val"
-          />          
-          <Button onPress={handleSubmit.bind(this)} title="Close"></Button>
+            style={{padding: 10}}
+            keyboardType="decimal-pad"
+          />
+          <View style={styles.buttons}>
+            <Button
+              onPress={handleCancel}            
+              icon={{type: 'font-awesome', name: 'close'}}
+              type="clear"
+            />
+            <Button               
+              onPress={handleSubmit.bind(this)}
+              icon={{type: 'font-awesome', name:'check'}}
+              type="clear"
+            />            
+          </View>
         </Overlay>
     </View>
 
   )
 }
+
+const styles = StyleSheet.create({
+  buttons:{
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: "space-between"   ,
+    marginTop: 30,
+    marginLeft: 40,
+    marginRight: 40
+  }
+})
 
 export default OverlayComponent;

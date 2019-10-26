@@ -19,6 +19,7 @@
     "react-native": "0.60.5",
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^1.2.6",
+    "react-native-enhanced-popup-menu": "^0.6.1",
     "react-native-firebase": "^5.5.6",
     "react-native-gesture-handler": "^1.4.1",
     "react-native-ui-xg": "^0.0.6",

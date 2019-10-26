@@ -1,9 +1,10 @@
-import React, {useEffect} from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Platform, Image, Text, View, ActivityIndicator, FlatList, Dimensions, Picker } from 'react-native'
 import firebase from 'react-native-firebase';
-import { ListItem, Overlay, Button, Input } from 'react-native-elements';
+import { ListItem, Overlay, Button, Input, SearchBar } from 'react-native-elements';
 
 import DatePicker from 'react-native-datepicker'
+import Menu, { MenuItem, MenuDivider, Position } from "react-native-enhanced-popup-menu";
 
 import OverlayComponent from './overlay'
 
@@ -18,13 +19,23 @@ export default class Main extends React.Component {
     title: 'Home',
     headerLeft: () => (
       <Button
+        type="clear"
         onPress={() => firebase.auth().signOut()}
         icon={{ type: 'simple-line-icon', name: 'logout' }}
       />
     ),
     headerRight: () => (
       <Button
-        onPress={() => console.log("Searched")}
+        type="clear"
+        onPress={() => this.prototype.props.navigation.setParams({
+          headerRigh: () => {
+            <SearchBar
+              placeholder="Type Here..."
+              onChangeText={this.updateSearch}
+              value={"Test"}
+            />
+          }
+        })}
         icon={{ type: 'material-community', name: 'account-search' }}
       />
     )
@@ -52,14 +63,19 @@ export default class Main extends React.Component {
     this.update = this.update.bind(this)
     this.searchCallback = this.searchCallback.bind(this)
 
-    this.interval = setInterval(() =>{
-      this.update()
-      console.log("Fall here")
+    this.interval = setInterval(() => {
+      this.update()      
     }, 60000)
+    this.showMenu = this.showMenu.bind(this)
   }
 
-  searchCallback(text) {
-    console.log("searched: ", text)
+  setMenuRef = ref => this.menuRef = ref
+  hideMenu = () => this.menuRef.hide();
+  showMenu = (ref) => {    
+    this.menuRef.show(ref, stickTo = Position.BOTTOM_CENTER);
+  }
+
+  searchCallback(text) {    
   }
 
   componentDidMount() {
@@ -70,27 +86,38 @@ export default class Main extends React.Component {
   }
 
   update = () => {
-    
     console.log("Updating")
     let data
     firebase.firestore().collection('users')
       .where("email", "==", firebase.auth().currentUser.email).get().then((snap) => {
         snap.forEach((doc) => {
           data = doc.data()
-
           this.setState({
             dados: data
           })
+          console.log("Received")          
         })
-      })
+      }).catch(e => console.log(e))            
   }
-  renderItem = ({ item }) => {
+  renderItem = ({ item }, i) => {
+    let value = 0;
+    item.contas.forEach((c) => {
+      value = value + c.valor
+    })
+
+    title = "R$ " + value.toFixed(2)
+
     return (
       <ListItem
+        ref={React.createRef()}
         style={{ alignSelf: "stretch" }}
-        title={item.descricao}
-        subtitle={item.valor}
-        bottomDivider
+        leftIcon={{type:'evilicon', name: 'user'}}
+        title={item.nome}
+        rightTitle={title}
+        rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}       
+        bottomDivider={true}
+        topDivider={true}
+        
       />
     )
   }
@@ -113,46 +140,106 @@ export default class Main extends React.Component {
     }
   }
 
+  getByName(arr, text) {    
+    let itemRet
+    arr.forEach((item) => {    
+      if (item.nome === text) {    
+        itemRet = item
+      }
+    })
+    
+    return itemRet ?  itemRet :  false
+  }
+
   modalCallback(data) {
     this.setState({
       visible: false
     })
-    if (!this.userRef.data().debitos) {
-      let debArray = []
-      debArray.push(data)
-      this.userRef.ref.update({
-        debitos: debArray
-      }).then(() => {
-        console.log("Added successfully")
-        this.update()
-      })
-        .catch(e => console.log("ERROR: ", e))
-    } else {
-      let debArray = []
-      debArray = this.userRef.data().debitos
-      debArray.push(data)
-      this.userRef.ref.update({
-        debitos: debArray
-      }).then(() => {
-        console.log("Added successfully")
-        this.update()
-      })
-        .catch(e => console.log("ERROR: ", e))
+    if (data) {      
+      if (!this.userRef.data().debitos) {
+        console.log("Debitos melhor n existe")
+        let debArray = []        
+        this.userRef.ref.update({
+          debitos: debArray
+        }).then(() => {
+          console.log("Added successfully")
+          this.update()
+        })
+          .catch(e => console.log("ERROR: ", e))
+      }
+
+      let usr = this.getByName(this.userRef.data().debitos, data.nome)
+      
+      if (usr) {
+        console.log('user exite')       
+        let arr = []
+        arr = usr.contas
+        let deb = this.userRef.data().debitos
+
+        arr.push({
+          categoria: data.categoria,
+          date: data.date,
+          descricao: data.descricao,
+          tipo: data.tipo,
+          valor: data.valor
+        })
+        usr = {
+          ...usr,
+          contas: arr
+        }
+        deb.forEach((u, i, a) => {
+          if(u.nome === usr.nome){
+            a[i] = usr
+          }
+        })
+        this.userRef.ref.update({
+          debitos: deb
+        }).then(() => {
+          console.log("Added successfully")
+          this.update()
+        })
+          .catch(e => console.log("ERROR: ", e))
+      } else {
+        console.log("user n existe")
+        let usr = {
+          nome: data.nome,
+          contas: [
+            {
+              categoria: data.categoria,
+              date: data.date,
+              descricao: data.descricao,
+              tipo: data.tipo,
+              valor: data.valor
+            },
+          ]
+        }
+
+        let arr = this.userRef.data().debitos
+        arr.push(usr)
+
+        this.userRef.ref.update({
+          debitos: arr
+        }).then(() => {
+          console.log("Added successfully")
+          this.update()
+        })
+          .catch(e => console.log("ERROR: ", e))
+      }     
     }
   }
 
-  render() {
-    const { currentUser } = this.state
+  render() {    
     let view
     if (this.state.dados) {
       let value = 0;
       this.state.dados.debitos.forEach((item) => {
-        console.log(value)
-        value = value + parseFloat(item.valor)
+        item.contas.forEach((conta) =>{          
+          value = value + conta.valor
+        })                
       })
 
       view =
-        <> 
+        <>
           <View style={styles.top}>
             <OverlayComponent
               callback={this.modalCallback.bind(this)}
@@ -160,30 +247,37 @@ export default class Main extends React.Component {
             />
             <View style={styles.container}>
               <Text>Balanço</Text>
-              <Text style={value > 0 ? styles.positive : styles.negative}>              
-                R$ {value}
+              <Text style={value > 0 ? styles.positive : styles.negative}>
+                R$ {value.toFixed(2)}
               </Text>
             </View>
           </View>
           <View style={styles.listContainer}>
-            
+            <Button
+              type="clear"
+              icon={{ type: 'material-community', name: 'plus-circle-outline' }}
+              onPress={() => this.open()}
+            />
             <FlatList
-                data={this.state.dados.debitos}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={this.renderItem}
-                style={{flexGrow: 0, height: height * .80}}              
-              />
+              data={this.state.dados.debitos}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={this.renderItem}
+              style={{ flexGrow: 0, height: height * .80 }}
+            />
           </View>
         </>
     } else {
-      view = 
+      view =
         <>
           <ActivityIndicator size="large" />
         </>
-    }    
+    }
 
     return (
       <View style={styles.master}>
+        <Menu ref={this.setMenuRef}>
+          <MenuItem onPress={this.hideMenu}>Item</MenuItem>
+        </Menu>
         {view}
       </View>
     )
@@ -193,7 +287,7 @@ const styles = StyleSheet.create({
   master: {
     flex: 1,
     alignSelf: 'center',
-    flexDirection: 'column',    
+    flexDirection: 'column',
   },
   top: {
     height: height * .15
@@ -211,16 +305,22 @@ const styles = StyleSheet.create({
     flexDirection: 'column-reverse',
     width: width * .95,
     height: 5000,
-    
+
   },
-  positive:{
+  positive: {
     fontSize: 40,
     fontWeight: 'bold',
     color: 'green'
   },
   negative: {
-    fontSize: 40,    
+    fontSize: 40,
     fontWeight: 'bold',
-    color:'red'
+    color: 'red'
+  },
+  listPositive:{
+    color: 'green'
+  },
+  listNegative:{
+    color: 'red'
   }
 })
