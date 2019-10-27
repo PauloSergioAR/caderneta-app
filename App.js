@@ -6,14 +6,15 @@ import Loading from './src/screens/loading/loading'
 import SignUp from './src/screens/signup/signup'
 import Login from './src/screens/login/login'
 import Main from './src/main/main'
+import User from './src/main/user'
+
 import { createStackNavigator } from 'react-navigation-stack';
 // create our app's navigation stack
 
 const Stack = createStackNavigator(
   {
-    MainScreen: {
-      screen: Main
-    }
+    MainScreen: Main,
+    UserScreen: User
   },{
     headerLayoutPreset:'center',
     defaultNavigationOptions: {      

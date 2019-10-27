@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Platform, Image, Text, View, ActivityIndicator, FlatList, Dimensions, Picker } from 'react-native'
+import React from 'react'
+import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions } from 'react-native'
 import firebase from 'react-native-firebase';
-import { ListItem, Overlay, Button, Input, SearchBar } from 'react-native-elements';
+import { ListItem, Button, SearchBar } from 'react-native-elements';
 
-import DatePicker from 'react-native-datepicker'
-import Menu, { MenuItem, MenuDivider, Position } from "react-native-enhanced-popup-menu";
+import Menu, { MenuItem, Position } from "react-native-enhanced-popup-menu";
 
 import OverlayComponent from './overlay'
-
-import * as IconEntypo from 'react-native-vector-icons/Entypo'
-import * as IconFontAwesome from 'react-native-vector-icons/FontAwesome5'
+import List from './components/list'
+import Balanco from './components/balanco'
 
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
@@ -45,12 +43,7 @@ export default class Main extends React.Component {
     super(props)
     this.state = {
       currentUser: null,
-      visible: false,
-      name: '',
-      description: '',
-      expire: '',
-      selectedValue: '0',
-      dateChanged: false,
+      visible: false,      
       dados: null
     }
 
@@ -60,29 +53,19 @@ export default class Main extends React.Component {
         this.userRef = doc
       })
     })
-    this.update = this.update.bind(this)
-    this.searchCallback = this.searchCallback.bind(this)
-
+   
+    this.update = this.update.bind(this)    
+    this.itemCallback = this.itemCallback.bind(this)
     this.interval = setInterval(() => {
       this.update()      
     }, 60000)
-    this.showMenu = this.showMenu.bind(this)
-  }
-
-  setMenuRef = ref => this.menuRef = ref
-  hideMenu = () => this.menuRef.hide();
-  showMenu = (ref) => {    
-    this.menuRef.show(ref, stickTo = Position.BOTTOM_CENTER);
-  }
-
-  searchCallback(text) {    
-  }
+    
+  }  
 
   componentDidMount() {
     const { currentUser } = firebase.auth()
     this.setState({ currentUser })
     this.update()
-
   }
 
   update = () => {
@@ -99,6 +82,7 @@ export default class Main extends React.Component {
         })
       }).catch(e => console.log(e))            
   }
+
   renderItem = ({ item }, i) => {
     let value = 0;
     item.contas.forEach((c) => {
@@ -116,8 +100,7 @@ export default class Main extends React.Component {
         rightTitle={title}
         rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}       
         bottomDivider={true}
-        topDivider={true}
-        
+        topDivider={true}        
       />
     )
   }
@@ -134,12 +117,6 @@ export default class Main extends React.Component {
     })
   }
 
-  handleComboboxChangeOption(val) {
-    if (val !== '0') {
-      this.setState({ selectedValue: val });
-    }
-  }
-
   getByName(arr, text) {    
     let itemRet
     arr.forEach((item) => {    
@@ -151,13 +128,22 @@ export default class Main extends React.Component {
     return itemRet ?  itemRet :  false
   }
 
+  itemCallback(name){
+    console.log(name)
+    this.props.navigation.navigate('UserScreen', {
+      name: name,
+      docRef: this.userRef      
+    })
+  }
+
   modalCallback(data) {
     this.setState({
       visible: false
     })
+
     if (data) {      
       if (!this.userRef.data().debitos) {
-        console.log("Debitos melhor n existe")
+        console.log("Debitos n existe")
         let debArray = []        
         this.userRef.ref.update({
           debitos: debArray
@@ -234,10 +220,10 @@ export default class Main extends React.Component {
       let value = 0;
       this.state.dados.debitos.forEach((item) => {
         item.contas.forEach((conta) =>{          
-          value = value + conta.valor
+          value = conta.tipo == 'receber' ? value + conta.valor : value - conta.valor
         })                
       })
-
+      console.log(value)
       view =
         <>
           <View style={styles.top}>
@@ -246,10 +232,7 @@ export default class Main extends React.Component {
               visible={this.state.visible}
             />
             <View style={styles.container}>
-              <Text>Balanço</Text>
-              <Text style={value > 0 ? styles.positive : styles.negative}>
-                R$ {value.toFixed(2)}
-              </Text>
+              <Balanco valor={value} showBal={true}/>
             </View>
           </View>
           <View style={styles.listContainer}>
@@ -258,12 +241,7 @@ export default class Main extends React.Component {
               icon={{ type: 'material-community', name: 'plus-circle-outline' }}
               onPress={() => this.open()}
             />
-            <FlatList
-              data={this.state.dados.debitos}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={this.renderItem}
-              style={{ flexGrow: 0, height: height * .80 }}
-            />
+            <List data={this.state.dados.debitos} itemCallback={this.itemCallback}/>
           </View>
         </>
     } else {
@@ -274,15 +252,13 @@ export default class Main extends React.Component {
     }
 
     return (
-      <View style={styles.master}>
-        <Menu ref={this.setMenuRef}>
-          <MenuItem onPress={this.hideMenu}>Item</MenuItem>
-        </Menu>
+      <View style={styles.master}>       
         {view}
       </View>
     )
   }
 }
+
 const styles = StyleSheet.create({
   master: {
     flex: 1,
@@ -305,22 +281,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column-reverse',
     width: width * .95,
     height: 5000,
-
-  },
-  positive: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: 'green'
-  },
-  negative: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: 'red'
-  },
-  listPositive:{
-    color: 'green'
-  },
-  listNegative:{
-    color: 'red'
-  }
+  }  
 })
