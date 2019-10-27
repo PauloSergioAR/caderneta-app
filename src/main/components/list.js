@@ -19,13 +19,11 @@ const List = (props) => {
     return (
       <ListItem        
         ref={React.createRef()}
-        style={{ alignSelf: "stretch" }}
+        style={{ alignSelf: "stretch", marginBottom: 2, marginLeft: 10, marginRight: 10, borderRadius: 100, elevation: 10 }}
         leftIcon={{ type: 'evilicon', name: 'user' }}
         title={item.nome}
         rightTitle={title}
-        rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}
-        bottomDivider={true}
-        topDivider={true}
+        rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}        
         onPress={() => props.itemCallback(item.nome)}
       />
     )
@@ -37,7 +35,7 @@ const List = (props) => {
         data={props.data}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderItens}
-        style={{ flexGrow: 0, height: height * .70 }}
+        style={{ flexGrow: 0, height: height * .68 }}
       />
     </View>
   )

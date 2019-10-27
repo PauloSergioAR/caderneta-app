@@ -15,7 +15,7 @@ const UserList = (props) => {
     return (
       <ListItem        
         ref={React.createRef()}
-        style={{ alignSelf: "stretch" }}
+        style={{ alignSelf: "stretch", marginBottom: 2, marginLeft: 10, marginRight: 10, borderRadius: 100, elevation: 10 }}
         leftIcon={item.tipo == 'receber' ? {type:'evilicon', name:'arrow-up'} : {type:'evilicon', name:'arrow-down'}}
         title={item.descricao}
         subtitle={item.date}

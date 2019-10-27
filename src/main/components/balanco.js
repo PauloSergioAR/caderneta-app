@@ -18,12 +18,12 @@ const styles = StyleSheet.create({
   positive: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: 'green'
+    color: 'white'
   },
   negative: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: 'red'
+    color: 'white'
   },  
 })
 

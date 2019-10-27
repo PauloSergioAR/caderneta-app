@@ -75,17 +75,19 @@ const OverlayComponent = (props) => {
       <Overlay
           isVisible={props.visible}
           width={width * .8}
-          height={height * .55}
+          height={height * .50}
         >
           <Input
             placeholder="nome"
             onChangeText={(text) => onNomeChange(text)}
             style={{padding: 10}}
+            leftIcon={{type: 'evilicon', name: 'user'}}
           />
           <Input
             placeholder="Descrição"
             onChangeText={(text) => onDescChange(text)}
             style={{padding: 10}}
+            leftIcon={{type: 'simple-line-icon', name: 'note'}}
           />
           <DatePicker
             style={{width: width * .73, padding: 10}}
@@ -121,6 +123,7 @@ const OverlayComponent = (props) => {
             placeholder="Categoria"
             onChangeText={(text) => onCatChange(text)}            
             style={{padding: 10}}
+            leftIcon={{type: 'entypo', name: 'list'}}
           />          
           <Input
             placeholder="Valor"
@@ -128,6 +131,7 @@ const OverlayComponent = (props) => {
             name="val"
             style={{padding: 10}}
             keyboardType="decimal-pad"
+            leftIcon={{type: 'material-community', name: 'cash-multiple'}}
           />
           <View style={styles.buttons}>
             <Button

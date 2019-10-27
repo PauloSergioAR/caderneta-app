@@ -1,9 +1,12 @@
 import React from 'react'
-import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions, Image } from 'react-native'
 import firebase from 'react-native-firebase';
 import { ListItem, Button, SearchBar } from 'react-native-elements';
 
 import Menu, { MenuItem, Position } from "react-native-enhanced-popup-menu";
+import LinearGradient from 'react-native-linear-gradient';
+
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import OverlayComponent from './overlay'
 import List from './components/list'
@@ -14,7 +17,7 @@ var height = Dimensions.get('window').height;
 
 export default class Main extends React.Component {
   static navigationOptions = {
-    title: 'Home',
+    headerTitle: (<Icon name={'notebook'} size={30}/>),
     headerLeft: () => (
       <Button
         type="clear"
@@ -216,14 +219,38 @@ export default class Main extends React.Component {
 
   render() {    
     let view
-    if (this.state.dados) {
+    console.log(this.state.dados)
+    if(this.state.dados && !this.state.dados.debitos){
+      console.log("sem lista")
+      view =
+        <>
+          <View style={styles.top}>
+            <OverlayComponent
+              callback={this.modalCallback.bind(this)}
+              visible={this.state.visible}
+            />
+            <View style={styles.container}>
+              <Balanco valor={0} showBal={true}/>
+            </View>
+          </View>
+          <View style={styles.listContainer}>
+            <Button
+              type="clear"
+              icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
+              onPress={() => this.open()}
+              buttonStyle={{height: 70, width: 70, alignSelf: 'flex-end'}}
+            />            
+          </View>
+        </>
+    } else if (this.state.dados && this.state.dados.debitos) {
+      console.log('com list')
       let value = 0;
       this.state.dados.debitos.forEach((item) => {
         item.contas.forEach((conta) =>{          
           value = conta.tipo == 'receber' ? value + conta.valor : value - conta.valor
         })                
       })
-      console.log(value)
+      
       view =
         <>
           <View style={styles.top}>
@@ -238,13 +265,15 @@ export default class Main extends React.Component {
           <View style={styles.listContainer}>
             <Button
               type="clear"
-              icon={{ type: 'material-community', name: 'plus-circle-outline' }}
+              icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
               onPress={() => this.open()}
+              buttonStyle={{height: 70, width: 70, alignSelf: 'flex-end'}}
             />
-            <List data={this.state.dados.debitos} itemCallback={this.itemCallback}/>
+            <List style={styles.list}data={this.state.dados.debitos} itemCallback={this.itemCallback}/>
           </View>
         </>
     } else {
+      console.log('carregando')
       view =
         <>
           <ActivityIndicator size="large" />
@@ -252,9 +281,18 @@ export default class Main extends React.Component {
     }
 
     return (
-      <View style={styles.master}>       
-        {view}
-      </View>
+      <LinearGradient
+        colors={['#9831F7', '#00C9E1']}
+        style={{ flex: 1 }}
+        start={{ x: 0.7, y: 0.7 }}
+        useAngle={true}
+        angle={90}
+        angleCenter={{ x: 0.3, y: 0.3 }}
+      >
+        <View style={styles.master}>       
+          {view}
+        </View>
+      </LinearGradient>
     )
   }
 }
@@ -264,6 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
     flexDirection: 'column',
+    
   },
   top: {
     height: height * .15
@@ -272,7 +311,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
     alignItems: 'center',
-    marginTop: 40
+    marginTop: 10
   },
 
   listContainer: {
@@ -280,6 +319,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'column-reverse',
     width: width * .95,
-    height: 5000,
-  }  
+    height: height,
+    backgroundColor: '#f5f5f5',
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+    elevation: 10,            
+  },
+  list:{
+    paddingTop: 30,
+  }
 })

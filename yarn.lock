@@ -5629,6 +5629,11 @@ react-native-label-select@^1.0.10:
   resolved "https://registry.yarnpkg.com/react-native-label-select/-/react-native-label-select-1.1.0.tgz#9bc7f78acf196b14f69c10d72ce68a02b6889538"
   integrity sha1-m8f3is8ZaxT2nBDXLOaKAraIlTg=
 
+react-native-linear-gradient@^2.5.6:
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
+  integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
+
 react-native-link-xg@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/react-native-link-xg/-/react-native-link-xg-0.0.1.tgz#8504ce4e6557ee8308f1056edad905322ca0c5bd"
