@@ -3,6 +3,9 @@ import { StyleSheet, Text, TextInput, View, Button } from 'react-native'
 
 import firebase from 'react-native-firebase'
 
+import Icon from 'react-native-vector-icons'
+import {Input} from 'react-native-elements'
+
 export default class Login extends React.Component {
   state = { email: '', password: '', errorMessage: null }
   handleLogin = () => {
@@ -10,7 +13,7 @@ export default class Login extends React.Component {
     const { email, password } = this.state
     firebase.auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => this.props.navigation.navigate('Main'))
+      .then(() => this.props.navigation.navigate('Stack'))
       .catch(error => this.setState({ errorMessage: error.message }))
     console.log('handleLogin')
   }
@@ -22,20 +25,22 @@ export default class Login extends React.Component {
           <Text style={{ color: 'red' }}>
             {this.state.errorMessage}
           </Text>}
-        <TextInput
+        <Input
           style={styles.textInput}
           autoCapitalize="none"
           placeholder="Email"
           onChangeText={email => this.setState({ email })}
           value={this.state.email}
+          leftIcon={{ type: 'font-awesome', name: 'mail' }}
         />
-        <TextInput
+        <Input
           secureTextEntry
           style={styles.textInput}
           autoCapitalize="none"
           placeholder="Password"
           onChangeText={password => this.setState({ password })}
           value={this.state.password}
+          leftIcon={{ type: 'font-awesome', name: 'lock' }}
         />
         <Button title="Login" onPress={this.handleLogin} />
         <Button
