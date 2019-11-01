@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, TextInput, View, Dimensions, Image } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Dimensions, Image, KeyboardAvoidingView, Keyboard } from 'react-native'
 
 import firebase from 'react-native-firebase'
 
@@ -12,17 +12,62 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Login extends React.Component {
-  state = { email: '', password: '', errorMessage: null }
+  state = { email: '', password: '', errorMessage: null, showImage: true }
+
+  componentWillUnmount(){
+    Keyboard.removeAllListeners('keyboardDidHide')
+  }
+
+  componentDidMount(){  
+    this.keyboardHideListener = Keyboard.addListener('keyboardDidHide', () =>{
+      this.emailField.blur()     
+      this.passField.blur()
+    })
+  }
+
+  looseFocus(){
+    
+  }
+
   handleLogin = () => {
 
-    const { email, password } = this.state
-    firebase.auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => this.props.navigation.navigate('Stack'))
-      .catch(error => this.setState({ errorMessage: error.message }))
+    let errorMessage
+    let emptyEmail = false
+    let { email, password } = this.state
+
+    if (email === '') {
+      errorMessage = "Email não pode estar vazio"
+      emptyEmail = true
+    }
+
+    if (password === '') {
+      if (emptyEmail)
+        errorMessage += "\nSenha não pode estar vazia"
+      else
+        errorMessage = "Senha não pode estar vazia"
+    }
+    if (!errorMessage) {
+      firebase.auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(() => this.props.navigation.navigate('Stack'))
+        .catch(error => this.setState({ errorMessage: error.message }))
+    } else {
+      this.setState({ errorMessage: errorMessage })
+    }
     console.log('handleLogin')
   }
   render() {
+
+    let image = this.state.showImage ? 
+      (<View style={styles.image} >
+        <Image source={require('../../res/logo_264_c_b.png')} />
+        {this.state.errorMessage &&
+          <Text style={{ color: 'red' }}>
+            {this.state.errorMessage}
+          </Text>}
+      </View>) :
+      <></>
+
     return (
       <LinearGradient
         colors={['#9831F7', '#00C9E1']}
@@ -32,21 +77,30 @@ export default class Login extends React.Component {
         angle={90}
         angleCenter={{ x: 0.3, y: 0.3 }}
       >
-        <Text style={styles.register}>Login</Text>
         <View style={styles.container}>
           <View style={styles.center}>
-
-            <View style={styles.image} >
-              <Image source={require('../../res/logo_264_c_b.png')} />
-              {this.state.errorMessage &&
-                <Text style={{ color: 'red' }}>
-                  {this.state.errorMessage}
-                </Text>}
+            <View style={styles.tabcontainer}>
+              <View style={styles.logincontainer}>
+                <Text
+                  style={styles.register}
+                  onPress={() => this.props.navigation.navigate('Login')}
+                >Login</Text>
+                <View style={{ backgroundColor: '#00C9E1', height: 3, width: 100, borderRadius: 100 }} />
+              </View>
+              <View style={styles.registercontainer}>
+                <Text
+                  onPress={() => this.props.navigation.navigate('SignUp')}
+                  style={styles.register}>Registro</Text>
+              </View>
             </View>
-            <View style={styles.form}>
+            {image}
+            <KeyboardAvoidingView style={styles.form} behavior="padding" enabled>
               <Input
-                style={styles.textInput}
-                autoCapitalize="none"
+                ref={(ref) => this.emailField = ref}              
+                onFocus={() => this.setState({showImage: false})}
+                onBlur={() => this.setState({showImage: true})}
+                containerStyle={styles.textInput}
+                leftIconContainerStyle={{ marginBottom: 10, marginTop: 8 }}
                 placeholder="Email"
                 onChangeText={email => this.setState({ email })}
                 value={this.state.email}
@@ -54,27 +108,23 @@ export default class Login extends React.Component {
               />
               <Input
                 secureTextEntry
-                style={styles.textInput}
-                autoCapitalize="none"
+                ref={(ref) => this.passField = ref}
+                onFocus={() => this.setState({showImage: false})}
+                onBlur={() => this.setState({showImage: true})}
+                containerStyle={styles.textInput}
+                leftIconContainerStyle={{ marginBottom: 10, marginTop: 8 }}
                 placeholder="Senha"
                 onChangeText={password => this.setState({ password })}
                 value={this.state.password}
                 leftIcon={{ type: 'font-awesome', name: 'lock' }}
               />
-              <Button 
+              <Button
                 title="Login"
                 onPress={this.handleLogin}
                 buttonStyle={styles.button}
                 type={"outline"}
               />
-
-              <Button
-                title="Don't have an account? Sign Up"
-                onPress={() => this.props.navigation.navigate('SignUp')}
-                buttonStyle={styles.button}
-                type={"outline"}
-              />
-            </View>
+            </KeyboardAvoidingView>
           </View>
         </View>
       </LinearGradient>
@@ -82,44 +132,48 @@ export default class Login extends React.Component {
   }
 }
 const styles = StyleSheet.create({
+  logincontainer: {
+    marginRight: 10,
+  },
+
+  registercontainer: {
+    marginLeft: 10
+  },
+
+  tabcontainer: {
+    marginTop: 100,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   textInput: {
-    height: 40,
-    //width: '90%',
-    borderColor: 'gray',
-    borderWidth: 1,
+    marginBottom: 20,
     marginTop: 8,
   },
   form: {
     width: width * .8,
-    marginBottom: 50,
   },
   center: {
-    backgroundColor: "#f5f5f5",
-    height: '60%',
-    width: '81%',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: "#000000",
-    shadowOpacity: 10,
-    shadowRadius: 5,
+    justifyContent: 'center',
     flexDirection: 'column',
     borderRadius: 6,
-    elevation: 10
   },
   image: {
     alignItems: 'center',
     marginTop: 10,
+    marginBottom: 30,
   },
   register: {
     alignSelf: "center",
     color: 'white',
-    fontWeight: "bold",
-    fontSize: 50
+    fontSize: 40,
+    fontFamily: 'notoserif'
   },
   button: {
     borderRadius: 10,

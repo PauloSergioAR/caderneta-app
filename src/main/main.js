@@ -28,7 +28,7 @@ export default class Main extends React.Component {
     headerRight: () => (
       <Button
         type="clear"
-        onPress={() => this.prototype.props.navigation.setParams({
+        /*onPress={() => this.prototype.props.navigation.setParams({
           headerRigh: () => {
             <SearchBar
               placeholder="Type Here..."
@@ -36,7 +36,7 @@ export default class Main extends React.Component {
               value={"Test"}
             />
           }
-        })}
+        })*}*/
         icon={{ type: 'material-community', name: 'account-search' }}
       />
     )
