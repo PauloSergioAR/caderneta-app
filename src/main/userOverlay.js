@@ -19,6 +19,10 @@ const OverlayComponent = (props) => {
   const [categoria, setCategoria] = useState('')
   const [valor, setValor] = useState('')
 
+  const [comboErr, setComboErr] = useState('0')  
+  const [valorErr, setValorErr] = useState('')
+  const [descricaoErr, setDescricaoErr] = useState('')  
+
   const onDescChange = useCallback(e => {
     setDescricao(e)
   })
@@ -46,6 +50,23 @@ const OverlayComponent = (props) => {
   }
 
   const handleSubmit = () => {
+    let err = false
+    if(descricao === ''){
+      setDescricaoErr("Descrição não pode estar vazia")
+      err = true
+    }      
+    if(combo === '0'){
+      setComboErr("Selecione um tipo de débito")
+      err = true
+    }      
+    if(valor === ''){
+      setValorErr("Valor não pode estar vazio")
+      err = true
+    }
+      
+    if(err)
+      return
+
     let data = {
       descricao: descricao,     
       date: date,
@@ -69,16 +90,20 @@ const OverlayComponent = (props) => {
           onBackdropPress={handleCancel}
           fullScreen={true}
         >
-          <Text style={{alignSelf: 'center', marginBottom: 10}}>Novo Débito</Text>
+          <Text 
+            style={{fontSize: 30, fontStyle: 'bold', alignSelf: "center", fontFamily: 'notoserif', color: '#00C9E1'}}>
+              Novo Débito
+          </Text>
           <Input
             placeholder="Descrição"
             onChangeText={(text) => onDescChange(text)}
             style={{padding: 10}}
             leftIcon={{type: 'simple-line-icon', name: 'note'}}
             maxLength={30}
+            errorMessage={descricaoErr}
           />          
           <DatePicker
-            style={{width: width * .73, padding: 10}}
+            style={{width: width * .73, padding: 10, alignSelf: 'center'}}
             date={date}
             mode="date"
             placeholder={date}
@@ -101,12 +126,13 @@ const OverlayComponent = (props) => {
           <Picker
             selectedValue={combo}
             onValueChange={onComboChange}
-            style={{padding: 10}}
+            style={{padding: 10, alignContent: 'center', width: '45%', alignSelf: "center"}}            
           >
-            <Picker.Item label="..." value='0'/>
+            <Picker.Item label="Tipo" value='0'/>
             <Picker.Item label="A Pagar" value="pagar"/>
             <Picker.Item label="A Receber" value="receber"/>
           </Picker>
+          <Text style={{color: 'red'}}>{comboErr != '0' && comboErr}</Text>
           <Input
             placeholder="Categoria"
             onChangeText={(text) => onCatChange(text)}            
@@ -122,6 +148,7 @@ const OverlayComponent = (props) => {
             keyboardType="decimal-pad"
             leftIcon={{type: 'material-community', name: 'cash-multiple'}}
             maxLength={8}
+            errorMessage={valorErr}
           />
           <View style={styles.buttons}>
             <Button

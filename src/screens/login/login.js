@@ -12,26 +12,26 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Login extends React.Component {
-  state = { email: '', password: '', errorMessage: null }
+  state = { email: '', password: '', emailErr: '', passErr: '' }
 
   handleLogin = () => {
 
     let errorMessage
     let emptyEmail = false
-    let { email, password } = this.state
+    let emptyPass = false
+    let email = this.state.email
+    let password = this.state.password
 
     if (email === '') {
-      errorMessage = "Email não pode estar vazio"
-      emptyEmail = true
+      this.setState({emailErr: "Email não pode estar vazio"})
+      emptyEmail = true      
     }
 
     if (password === '') {
-      if (emptyEmail)
-        errorMessage += "\nSenha não pode estar vazia"
-      else
-        errorMessage = "Senha não pode estar vazia"
+      this.setState({passErr: "Senha não pode estar vazia"})
+      emptyPass = true
     }
-    if (!errorMessage) {
+    if (!emptyEmail && !emptyPass) {
       firebase.auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => this.props.navigation.navigate('Stack'))
@@ -85,6 +85,7 @@ export default class Login extends React.Component {
                 onChangeText={email => this.setState({ email })}
                 value={this.state.email}
                 leftIcon={{ type: 'ionicon', name: 'ios-mail' }}
+                errorMessage={this.state.emailErr}
               />
               <Input
                 secureTextEntry                
@@ -94,6 +95,7 @@ export default class Login extends React.Component {
                 onChangeText={password => this.setState({ password })}
                 value={this.state.password}
                 leftIcon={{ type: 'font-awesome', name: 'lock' }}
+                errorMessage={this.state.passErr}
               />
               <Button
                 title="Login"

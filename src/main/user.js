@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { View, Text, StyleSheet, Dimensions, NativeMethodsMixin } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, NativeMethodsMixin, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
 
 import List from './components/userList'
@@ -15,6 +15,11 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class User extends Component {
+
+  static navigationOptions = {
+    headerTransparent: true
+  }
+
   constructor(props) {
     super(props)
     let name = props.navigation.getParam('name', '')
@@ -158,7 +163,8 @@ export default class User extends Component {
     let val = 0;        
     if (this.state.dados && this.state.dados.contas) {        
       this.state.dados.contas.forEach(item => {
-        val = item.tipo == 'receber' ? val + item.valor : val - item.valor
+        if(!item.quitado)
+          val = item.tipo == 'receber' ? val + item.valor : val - item.valor
       })
        list =
         (
@@ -179,6 +185,7 @@ export default class User extends Component {
         angle={90}
         angleCenter={{ x: 0.3, y: 0.3 }}
       >
+        <StatusBar barStyle="light-content" backgroundColor="#0CA2F7"/>
         <OverlayComponent
           callback={this.modalCallback.bind(this)}
           visible={this.state.visible}
@@ -216,7 +223,8 @@ const styles = StyleSheet.create({
     width: width * .95
   },
   top: {
-    height: height * .15
+    height: height * .15,
+    marginTop: 45
   },
   container: {
     flex: 1,

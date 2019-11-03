@@ -12,33 +12,28 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class SignUp extends React.Component {
-  state = { email: '', password: '', name: '', errorMessage: null }
+  state = { email: '', password: '', name: '', nameError: '', emailErr: '', passErr: '' }
   
   handleSignUp = () => {
     let errorMessage;
     let emailEmpty, nameEmpty, passEmpty = false
 
     if (this.state.email === '') {
-      errorMessage = "Email não pode estar vazio"
+      this.setState({emailErr: "Email não pode estar vazio"})
       emailEmpty = true
     }
 
     if (this.state.name === '') {
-      nameEmpty = true
-      if (emailEmpty)
-        errorMessage += "\nNome não pode estar vazio"
-      else
-        errorMessage = "Nome não pode estar vazio"
+      this.setState({nameError: "Nome não pode estar vazio"})
+      nameEmpty = true      
     }
 
     if (this.state.password === '') {
-      if (emailEmpty || nameEmpty)
-        errorMessage += "\nSenha não pode estar vazia"
-      else
-        errorMessage = "Senha não pode estar vazia"
+      this.setState({passErr: "Senha não pode estar vazia"})
+      passEmpty = true
     }
 
-    if (!errorMessage) {
+    if (!emailEmpty && !nameEmpty && !passEmpty) {
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)

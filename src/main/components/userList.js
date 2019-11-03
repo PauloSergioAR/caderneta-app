@@ -11,14 +11,7 @@ var height = Dimensions.get('window').height;
 const UserList = (props) => {
 
   function renderItens (item, index)  {
-    let swiperight = [
-      {
-        text: "Editar",
-        backgroundColor: 'blue',
-        onPress: () => {          
-          console.log("Editar")
-        }
-      },
+    let swiperight = [      
       {
         text: 'Quitar',
         backgroundColor: 'green',
@@ -48,9 +41,14 @@ const UserList = (props) => {
           style={{ alignSelf: "stretch", marginBottom: 2, marginLeft: 10, marginRight: 10, borderRadius: 100, elevation: 10 }}
           leftIcon={item.tipo == 'receber' ? {type:'evilicon', name:'arrow-up'} : {type:'evilicon', name:'arrow-down'}}
           title={item.descricao}
+          titleStyle={item.quitado ? {textDecorationLine: 'line-through'} : {textDecorationStyle: 'solid'}}
           subtitle={item.date}
           rightTitle={title}
-          rightTitleStyle={item.tipo == 'receber' ? styles.listPositive : styles.listNegative}
+          rightTitleStyle=
+          {[
+            item.tipo == 'receber' ? styles.listPositive : styles.listNegative,
+            item.quitado ? {textDecorationLine: 'line-through'} : {textDecorationStyle: 'solid'}
+          ]}
           bottomDivider={true}
           topDivider={true}        
         />

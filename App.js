@@ -17,10 +17,9 @@ const Stack = createStackNavigator(
   {
     MainScreen: Main,
     UserScreen: User
-  },{
-    headerLayoutPreset:'center',
-    defaultNavigationOptions: {      
-    }
+  }, {
+    transparentCard: true,
+    headerTranparent: true
   })
 
 const App = createAppContainer(
@@ -30,7 +29,7 @@ const App = createAppContainer(
     SignUp: SignUp,
     Login: Login,
     Stack: Stack
-    },
+  },
     {
       initialRouteName: 'Loading'
     }

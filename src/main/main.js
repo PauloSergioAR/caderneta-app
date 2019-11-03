@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions, Image } from 'react-native'
+import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions, Image, StatusBar } from 'react-native'
 import firebase from 'react-native-firebase';
 import { ListItem, Button, SearchBar } from 'react-native-elements';
 
@@ -16,21 +16,15 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Main extends React.Component {
-  static navigationOptions = {
-    headerTitle: (<Icon name={'notebook'} size={30}/>),
+  static navigationOptions = {    
     headerLeft: () => (
       <Button
         type="clear"
         onPress={() => firebase.auth().signOut()}
         icon={{ type: 'simple-line-icon', name: 'logout' }}
       />
-    ),
-    headerRight: () => (
-      <Button
-        type="clear"        
-        icon={{ type: 'material-community', name: 'account-search' }}
-      />
-    )
+    ),   
+    headerTransparent: true
   }
 
   constructor(props) {
@@ -239,7 +233,7 @@ export default class Main extends React.Component {
               visible={this.state.visible}
             />
             <View style={styles.container}>
-              <Balanco valor={0} showBal={true}/>
+              <Balanco valor={0} showBal={false}/>
             </View>
           </View>
           <View style={styles.listContainer}>
@@ -255,8 +249,9 @@ export default class Main extends React.Component {
       console.log('com list')
       let value = 0;
       this.state.dados.debitos.forEach((item) => {
-        item.contas.forEach((conta) =>{          
-          value = conta.tipo == 'receber' ? value + conta.valor : value - conta.valor
+        item.contas.forEach((conta) =>{
+          if(!conta.quitado)
+            value = conta.tipo == 'receber' ? value + conta.valor : value - conta.valor
         })                
       })
       
@@ -268,7 +263,7 @@ export default class Main extends React.Component {
               visible={this.state.visible}
             />
             <View style={styles.container}>
-              <Balanco valor={value} showBal={true}/>
+              <Balanco valor={value} showBal={false}/>
             </View>
           </View>
           <View style={styles.listContainer}>
@@ -298,6 +293,7 @@ export default class Main extends React.Component {
         angle={90}
         angleCenter={{ x: 0.3, y: 0.3 }}
       >
+        <StatusBar barStyle="light-content" backgroundColor="#0CA2F7"/>
         <View style={styles.master}>       
           {view}
         </View>
@@ -314,13 +310,16 @@ const styles = StyleSheet.create({
     
   },
   top: {
-    height: height * .15
+    height: height * .15,
+    marginTop: 30,
+    marginBottom: 20
   },
   container: {
     flex: 1,
     alignSelf: 'center',
     alignItems: 'center',
-    marginTop: 10
+    marginTop: 50,
+    marginBottom: 20
   },
 
   listContainer: {

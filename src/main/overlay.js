@@ -12,13 +12,18 @@ var height = Dimensions.get('window').height;
 
 var data={ }
 
-const OverlayComponent = (props) => {  
+const OverlayComponent = (props) => {
   const [nome, setNome] = useState('')
   const [descricao, setDescricao] = useState('')
   const [date, setDate] = useState(new Date().getDate() + "-" + new Date().getMonth() + "-" + new Date().getFullYear())
   const [combo, setCombo] = useState('0')
   const [categoria, setCategoria] = useState('')
   const [valor, setValor] = useState('')
+
+  const [nomeErr, setNomeErr] = useState('')
+  const [descricaoErr, setDescricaoErr] = useState('')  
+  const [comboErr, setComboErr] = useState('0')  
+  const [valorErr, setValorErr] = useState('')
 
   onNomeChange = useCallback(e => {
     setNome(e)
@@ -52,6 +57,28 @@ const OverlayComponent = (props) => {
   }
 
   const handleSubmit = () => {
+    let err = false
+
+    if(nome === ''){
+      setNomeErr("Nome não pode estar vazio")
+      err = true
+    }      
+    if(descricao === ''){
+      setDescricaoErr("Descrição não pode estar vazia")
+      err = true
+    }      
+    if(combo === '0'){
+      setComboErr("Selecione um tipo de débito")
+      err = true
+    }      
+    if(valor === ''){
+      setValorErr("Valor não pode estar vazio")
+      err = true
+    }
+      
+    if(err)
+      return
+
     let data = {
       nome:nome,
       descricao: descricao,
@@ -60,12 +87,13 @@ const OverlayComponent = (props) => {
       categoria: categoria,
       valor: parseFloat(valor)
     }
+
     props.callback(data)
     data = null
     setNome('')
     setCategoria('')
     setCombo('0')
-    setDate(new Date().getDate())
+    setDate(new Date().getDate() + "-" + new Date().getMonth() + "-" + new Date().getFullYear())
     setValor('')
   }
 
@@ -77,23 +105,28 @@ const OverlayComponent = (props) => {
           onBackdropPress={handleCancel}
           fullScreen={true}
         >
-          <Text style={{alignSelf: "center", fontFamily: 'notoserif', color: '#00C9E1'}}>Nova Ficha</Text>
+          <Text 
+            style={{fontSize: 30, fontStyle: 'bold', alignSelf: "center", fontFamily: 'notoserif', color: '#00C9E1'}}>
+              Nova Ficha
+          </Text>
           <Input
             placeholder="nome"
             onChangeText={(text) => onNomeChange(text)}
             style={{padding: 10}}
             leftIcon={{type: 'evilicon', name: 'user'}}
             maxLength={30}
+            errorMessage={nomeErr}
           />
           <Input
             placeholder="Descrição"
             onChangeText={(text) => onDescChange(text)}
             style={{padding: 10}}
             leftIcon={{type: 'simple-line-icon', name: 'note'}}
+            errorMessage={descricaoErr}
           />
          
           <DatePicker
-            style={{width: width * .73, padding: 10}}            
+            style={{width: width * .73, padding: 10, alignSelf: 'center'}}            
             date={date}
             mode="date"
             placeholder={date}
@@ -116,12 +149,13 @@ const OverlayComponent = (props) => {
           <Picker
             selectedValue={combo}
             onValueChange={onComboChange}
-            style={{padding: 10, alignContent: 'center', width: '45%', alignSelf: "center"}}
+            style={{padding: 10, alignContent: 'center', width: '45%', alignSelf: "center"}}            
           >
             <Picker.Item label="Tipo" value='0'/>
             <Picker.Item label="A Pagar" value="pagar"/>
             <Picker.Item label="A Receber" value="receber"/>
           </Picker>
+          <Text style={{color: "red"}}>{comboErr != '0' && comboErr}</Text>
           <Input
             placeholder="Categoria"
             onChangeText={(text) => onCatChange(text)}            
@@ -137,6 +171,7 @@ const OverlayComponent = (props) => {
             keyboardType="decimal-pad"
             leftIcon={{type: 'material-community', name: 'cash-multiple'}}
             maxLength={8}
+            errorMessage={valorErr}
           />
           <View style={styles.buttons}>
             <Button

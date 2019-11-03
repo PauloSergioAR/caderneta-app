@@ -12,7 +12,8 @@ const List = (props) => {
   function renderItens (item , index)  {
     let value = 0;
     item.contas.forEach((c) => {
-      value = c.tipo == 'receber' ? value + c.valor : value - c.valor
+      if(!c.quitado)
+        value = c.tipo == 'receber' ? value + c.valor : value - c.valor
     })
 
     title = "R$ " + value.toFixed(2)
