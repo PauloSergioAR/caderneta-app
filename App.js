@@ -8,7 +8,7 @@ import Login from './src/screens/login/login'
 import Main from './src/main/main'
 import User from './src/main/user'
 
-import Auth from './src/screens/auth_screen'
+
 
 import { createStackNavigator } from 'react-navigation-stack';
 

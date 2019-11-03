@@ -27,16 +27,7 @@ export default class Main extends React.Component {
     ),
     headerRight: () => (
       <Button
-        type="clear"
-        /*onPress={() => this.prototype.props.navigation.setParams({
-          headerRigh: () => {
-            <SearchBar
-              placeholder="Type Here..."
-              onChangeText={this.updateSearch}
-              value={"Test"}
-            />
-          }
-        })*}*/
+        type="clear"        
         icon={{ type: 'material-community', name: 'account-search' }}
       />
     )
@@ -81,9 +72,10 @@ export default class Main extends React.Component {
           this.setState({
             dados: data
           })
-          console.log("Received")          
+          this.userRef = doc       
         })
-      }).catch(e => console.log(e))            
+      }).catch(e => console.log(e))
+      this.userRef && console.log(this.userRef.data())          
   }
 
   renderItem = ({ item }, i) => {
@@ -131,11 +123,11 @@ export default class Main extends React.Component {
     return itemRet ?  itemRet :  false
   }
 
-  itemCallback(name){
-    console.log(name)
+  itemCallback(name){    
     this.props.navigation.navigate('UserScreen', {
       name: name,
-      docRef: this.userRef      
+      docRef: this.userRef,
+      colRef: this.ref     
     })
   }
 
@@ -160,7 +152,7 @@ export default class Main extends React.Component {
       let usr = this.getByName(this.userRef.data().debitos, data.nome)
       
       if (usr) {
-        console.log('user exite')       
+        console.log('user existe')       
         let arr = []
         arr = usr.contas
         let deb = this.userRef.data().debitos
@@ -217,9 +209,26 @@ export default class Main extends React.Component {
     }
   }
 
+  excluir(i){
+    console.log(i)
+    let array = this.userRef.data().debitos    
+    let newdebitosArray = []
+
+    array.forEach((item, index) => {      
+      if(index != i){
+        console.log("pushing " + item.nome)
+        newdebitosArray.push(item)
+      }
+    })
+    console.log(newdebitosArray)
+    this.userRef.ref.update({
+      debitos: newdebitosArray
+    }).then(() => this.update())
+    .catch(e => console.log(e.message))    
+  }
+
   render() {    
-    let view
-    console.log(this.state.dados)
+    let view    
     if(this.state.dados && !this.state.dados.debitos){
       console.log("sem lista")
       view =
@@ -269,7 +278,7 @@ export default class Main extends React.Component {
               onPress={() => this.open()}
               buttonStyle={{height: 70, width: 70, alignSelf: 'flex-end'}}
             />
-            <List style={styles.list}data={this.state.dados.debitos} itemCallback={this.itemCallback}/>
+            <List style={styles.list}data={this.state.dados.debitos} itemCallback={this.itemCallback} excluir={this.excluir.bind(this)}/>
           </View>
         </>
     } else {

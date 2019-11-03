@@ -12,22 +12,7 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Login extends React.Component {
-  state = { email: '', password: '', errorMessage: null, showImage: true }
-
-  componentWillUnmount(){
-    Keyboard.removeAllListeners('keyboardDidHide')
-  }
-
-  componentDidMount(){  
-    this.keyboardHideListener = Keyboard.addListener('keyboardDidHide', () =>{
-      this.emailField.blur()     
-      this.passField.blur()
-    })
-  }
-
-  looseFocus(){
-    
-  }
+  state = { email: '', password: '', errorMessage: null }
 
   handleLogin = () => {
 
@@ -73,9 +58,7 @@ export default class Login extends React.Component {
         colors={['#9831F7', '#00C9E1']}
         style={{ flex: 1 }}
         start={{ x: 0.7, y: 0.7 }}
-        useAngle={true}
-        angle={90}
-        angleCenter={{ x: 0.3, y: 0.3 }}
+        useAngle={true}      
       >
         <View style={styles.container}>
           <View style={styles.center}>
@@ -92,13 +75,10 @@ export default class Login extends React.Component {
                   onPress={() => this.props.navigation.navigate('SignUp')}
                   style={styles.register}>Registro</Text>
               </View>
-            </View>
-            {image}
+            </View>            
             <KeyboardAvoidingView style={styles.form} behavior="padding" enabled>
               <Input
-                ref={(ref) => this.emailField = ref}              
-                onFocus={() => this.setState({showImage: false})}
-                onBlur={() => this.setState({showImage: true})}
+                ref={(ref) => this.emailField = ref}                              
                 containerStyle={styles.textInput}
                 leftIconContainerStyle={{ marginBottom: 10, marginTop: 8 }}
                 placeholder="Email"
@@ -107,10 +87,7 @@ export default class Login extends React.Component {
                 leftIcon={{ type: 'ionicon', name: 'ios-mail' }}
               />
               <Input
-                secureTextEntry
-                ref={(ref) => this.passField = ref}
-                onFocus={() => this.setState({showImage: false})}
-                onBlur={() => this.setState({showImage: true})}
+                secureTextEntry                
                 containerStyle={styles.textInput}
                 leftIconContainerStyle={{ marginBottom: 10, marginTop: 8 }}
                 placeholder="Senha"
@@ -157,6 +134,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   form: {
+    marginTop: 64,
     width: width * .8,
   },
   center: {
@@ -172,7 +150,7 @@ const styles = StyleSheet.create({
   register: {
     alignSelf: "center",
     color: 'white',
-    fontSize: 40,
+    fontSize: 30,
     fontFamily: 'notoserif'
   },
   button: {

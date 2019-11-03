@@ -10,19 +10,14 @@ import DatePicker from 'react-native-datepicker'
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
-var data={ }
+var data={}
 
-const OverlayComponent = (props) => {  
-  const [nome, setNome] = useState('')
+const OverlayComponent = (props) => {    
   const [descricao, setDescricao] = useState('')
   const [date, setDate] = useState(new Date().getDate() + "-" + new Date().getMonth() + "-" + new Date().getFullYear())
   const [combo, setCombo] = useState('0')
   const [categoria, setCategoria] = useState('')
   const [valor, setValor] = useState('')
-
-  onNomeChange = useCallback(e => {
-    setNome(e)
-  })
 
   const onDescChange = useCallback(e => {
     setDescricao(e)
@@ -48,20 +43,18 @@ const OverlayComponent = (props) => {
 
   const handleCancel = () => {
     props.callback(null)
-
   }
 
   const handleSubmit = () => {
     let data = {
-      nome:nome,
+      descricao: descricao,     
       date: date,
       tipo: combo,
       categoria: categoria,
       valor: parseFloat(valor)
     }
     props.callback(data)
-    data = null
-    setNome('')
+    data = null    
     setCategoria('')
     setCombo('0')
     setDate(new Date().getDate())
@@ -69,30 +62,23 @@ const OverlayComponent = (props) => {
   }
 
   return(
-    <View >
+    <View>
       <Overlay
-          isVisible={props.visible}          
+          isVisible={props.visible}
           animationType={"slide"}
           onBackdropPress={handleCancel}
           fullScreen={true}
         >
-          <Text style={{alignSelf: "center", fontFamily: 'notoserif', color: '#00C9E1'}}>Nova Ficha</Text>
-          <Input
-            placeholder="nome"
-            onChangeText={(text) => onNomeChange(text)}
-            style={{padding: 10}}
-            leftIcon={{type: 'evilicon', name: 'user'}}
-            maxLength={30}
-          />
+          <Text style={{alignSelf: 'center', marginBottom: 10}}>Novo Débito</Text>
           <Input
             placeholder="Descrição"
             onChangeText={(text) => onDescChange(text)}
             style={{padding: 10}}
             leftIcon={{type: 'simple-line-icon', name: 'note'}}
-          />
-         
+            maxLength={30}
+          />          
           <DatePicker
-            style={{width: width * .73, padding: 10}}            
+            style={{width: width * .73, padding: 10}}
             date={date}
             mode="date"
             placeholder={date}
@@ -115,9 +101,9 @@ const OverlayComponent = (props) => {
           <Picker
             selectedValue={combo}
             onValueChange={onComboChange}
-            style={{padding: 10, alignContent: 'center', width: '45%', alignSelf: "center"}}
+            style={{padding: 10}}
           >
-            <Picker.Item label="Tipo" value='0'/>
+            <Picker.Item label="..." value='0'/>
             <Picker.Item label="A Pagar" value="pagar"/>
             <Picker.Item label="A Receber" value="receber"/>
           </Picker>
