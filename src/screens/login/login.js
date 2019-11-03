@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, TextInput, View, Dimensions, Image, KeyboardAvoidingView, Keyboard } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Dimensions, Image, KeyboardAvoidingView, Keyboard, ActivityIndicator } from 'react-native'
 
 import firebase from 'react-native-firebase'
 
@@ -12,10 +12,10 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Login extends React.Component {
-  state = { email: '', password: '', emailErr: '', passErr: '' }
+  state = { email: '', password: '', emailErr: '', passErr: '', loading: false }
 
   handleLogin = () => {
-
+    this.setState({loading: true})
     let errorMessage
     let emptyEmail = false
     let emptyPass = false
@@ -34,24 +34,27 @@ export default class Login extends React.Component {
     if (!emptyEmail && !emptyPass) {
       firebase.auth()
         .signInWithEmailAndPassword(email, password)
-        .then(() => this.props.navigation.navigate('Stack'))
+        .then(() => {
+          this.setState({loading: false})
+          this.props.navigation.navigate('Stack')
+        })
         .catch(error => this.setState({ errorMessage: error.message }))
     } else {
-      this.setState({ errorMessage: errorMessage })
+      this.setState({ errorMessage: errorMessage, loading: false })
     }
     console.log('handleLogin')
   }
   render() {
 
-    let image = this.state.showImage ? 
-      (<View style={styles.image} >
-        <Image source={require('../../res/logo_264_c_b.png')} />
-        {this.state.errorMessage &&
-          <Text style={{ color: 'red' }}>
-            {this.state.errorMessage}
-          </Text>}
-      </View>) :
-      <></>
+    let btn = this.state.loading ? 
+      <ActivityIndicator style={{marginBottom: 5, marginTop: 10, alignSelf: 'center'}} size="large" color="#f5f5f5"/> : 
+      <Button
+        title="Login"
+        onPress={this.handleLogin}
+        buttonStyle={styles.button}
+        type={"outline"}
+      />
+     
 
     return (
       <LinearGradient
@@ -96,14 +99,9 @@ export default class Login extends React.Component {
                 value={this.state.password}
                 leftIcon={{ type: 'font-awesome', name: 'lock' }}
                 errorMessage={this.state.passErr}
-              />
-              <Button
-                title="Login"
-                onPress={this.handleLogin}
-                buttonStyle={styles.button}
-                type={"outline"}
-              />
+              />              
             </KeyboardAvoidingView>
+            {btn}
           </View>
         </View>
       </LinearGradient>

@@ -1,6 +1,8 @@
 import React from 'react'
-import { StyleSheet, Text, TextInput, View, Image,
-   Dimensions, Keyboard, ImageBackground, StatusBar } from 'react-native'
+import {
+  StyleSheet, Text, TextInput, View, Image,
+  Dimensions, Keyboard, ImageBackground, StatusBar, ActivityIndicator
+} from 'react-native'
 import { Button } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 
@@ -12,24 +14,25 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class SignUp extends React.Component {
-  state = { email: '', password: '', name: '', nameError: '', emailErr: '', passErr: '' }
-  
+  state = { email: '', password: '', name: '', nameError: '', emailErr: '', passErr: '', loading: false }
+
   handleSignUp = () => {
+    this.setState({ loading: true })
     let errorMessage;
     let emailEmpty, nameEmpty, passEmpty = false
 
     if (this.state.email === '') {
-      this.setState({emailErr: "Email não pode estar vazio"})
+      this.setState({ emailErr: "Email não pode estar vazio" })
       emailEmpty = true
     }
 
     if (this.state.name === '') {
-      this.setState({nameError: "Nome não pode estar vazio"})
-      nameEmpty = true      
+      this.setState({ nameError: "Nome não pode estar vazio" })
+      nameEmpty = true
     }
 
     if (this.state.password === '') {
-      this.setState({passErr: "Senha não pode estar vazia"})
+      this.setState({ passErr: "Senha não pode estar vazia" })
       passEmpty = true
     }
 
@@ -38,6 +41,7 @@ export default class SignUp extends React.Component {
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(() => {
+          this.setState({loading: false})
           this.props.navigation.navigate('Stack')
           firebase.firestore().collection('users').add({
             name: this.state.name,
@@ -48,14 +52,22 @@ export default class SignUp extends React.Component {
         .catch(error => this.setState({ errorMessage: error.message }))
     } else {
       this.setState({
-        errorMessage: errorMessage
+        errorMessage: errorMessage,
+        loading: false
       })
     }
 
     console.log('handleSignUp')
   }
   render() {
-
+    let btn = this.state.loading ?
+      <ActivityIndicator style={{ marginBottom: 5, marginTop: 10, alignSelf: 'center' }} size="large" color="#f5f5f5" /> :
+      <Button
+        title="Registrar"
+        onPress={this.handleSignUp}
+        buttonStyle={styles.button}
+        type={"outline"}
+      />
     return (
       <LinearGradient
         colors={['#9831F7', '#00C9E1']}
@@ -63,9 +75,9 @@ export default class SignUp extends React.Component {
         start={{ x: 0.7, y: 0.7 }}
         useAngle={true}
       >
-        <StatusBar barStyle="light-content" backgroundColor="#0CA2F7"/>
+        <StatusBar barStyle="light-content" backgroundColor="#0CA2F7" />
         <View style={styles.container}>
-          <View style={styles.center}>            
+          <View style={styles.center}>
             <View style={styles.tabcontainer}>
               <View style={styles.logincontainer}>
                 <Text
@@ -81,9 +93,9 @@ export default class SignUp extends React.Component {
                   style={{ backgroundColor: '#00C9E1', height: 3, width: 120, borderRadius: 100 }} />
               </View>
             </View>
-            
+
             <View style={styles.form}>
-              <Input                
+              <Input
                 containerStyle={styles.textInput}
                 leftIconContainerStyle={{ marginBottom: 10, marginTop: 8 }}
                 autoCapitalize="none"
@@ -91,8 +103,9 @@ export default class SignUp extends React.Component {
                 onChangeText={name => this.setState({ name })}
                 value={this.state.name}
                 leftIcon={{ type: 'font-awesome', name: 'user' }}
+                errorMessage={this.state.nameError}
               />
-              <Input                
+              <Input
                 containerStyle={styles.textInput}
                 leftIconContainerStyle={{ marginBottom: 10, marginTop: 8 }}
                 autoCapitalize="none"
@@ -100,8 +113,9 @@ export default class SignUp extends React.Component {
                 onChangeText={email => this.setState({ email })}
                 value={this.state.email}
                 leftIcon={{ type: 'ionicon', name: 'ios-mail' }}
+                errorMessage={this.state.emailErr}
               />
-              <Input              
+              <Input
                 secureTextEntry
                 containerStyle={styles.textInput}
                 leftIconContainerStyle={{ marginBottom: 10, marginTop: 8 }}
@@ -110,16 +124,12 @@ export default class SignUp extends React.Component {
                 onChangeText={password => this.setState({ password })}
                 value={this.state.password}
                 leftIcon={{ type: 'font-awesome', name: 'lock' }}
+                errorMessage={this.state.passErr}
               />
-              <Button
-                title="Registrar"
-                onPress={this.handleSignUp}
-                buttonStyle={styles.button}
-                type={"outline"}
-              />
+              {btn}
             </View>
           </View>
-        </View>      
+        </View>
       </LinearGradient>
     )
   }

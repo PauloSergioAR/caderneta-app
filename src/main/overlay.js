@@ -114,7 +114,7 @@ const OverlayComponent = (props) => {
             onChangeText={(text) => onNomeChange(text)}
             style={{padding: 10}}
             leftIcon={{type: 'evilicon', name: 'user'}}
-            maxLength={30}
+            maxLength={20}
             errorMessage={nomeErr}
           />
           <Input
@@ -123,6 +123,7 @@ const OverlayComponent = (props) => {
             style={{padding: 10}}
             leftIcon={{type: 'simple-line-icon', name: 'note'}}
             errorMessage={descricaoErr}
+            maxLength={20}
           />
          
           <DatePicker

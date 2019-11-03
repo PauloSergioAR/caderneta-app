@@ -99,7 +99,7 @@ const OverlayComponent = (props) => {
             onChangeText={(text) => onDescChange(text)}
             style={{padding: 10}}
             leftIcon={{type: 'simple-line-icon', name: 'note'}}
-            maxLength={30}
+            maxLength={20}
             errorMessage={descricaoErr}
           />          
           <DatePicker

@@ -16,14 +16,14 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Main extends React.Component {
-  static navigationOptions = {    
+  static navigationOptions = {
     headerLeft: () => (
       <Button
         type="clear"
         onPress={() => firebase.auth().signOut()}
         icon={{ type: 'simple-line-icon', name: 'logout' }}
       />
-    ),   
+    ),
     headerTransparent: true
   }
 
@@ -31,7 +31,7 @@ export default class Main extends React.Component {
     super(props)
     this.state = {
       currentUser: null,
-      visible: false,      
+      visible: false,
       dados: null
     }
 
@@ -41,14 +41,14 @@ export default class Main extends React.Component {
         this.userRef = doc
       })
     })
-   
-    this.update = this.update.bind(this)    
+
+    this.update = this.update.bind(this)
     this.itemCallback = this.itemCallback.bind(this)
     this.interval = setInterval(() => {
-      this.update()      
+      this.update()
     }, 60000)
-    
-  }  
+
+  }
 
   componentDidMount() {
     const { currentUser } = firebase.auth()
@@ -66,10 +66,10 @@ export default class Main extends React.Component {
           this.setState({
             dados: data
           })
-          this.userRef = doc       
+          this.userRef = doc
         })
       }).catch(e => console.log(e))
-      this.userRef && console.log(this.userRef.data())          
+    this.userRef && console.log(this.userRef.data())
   }
 
   renderItem = ({ item }, i) => {
@@ -84,12 +84,12 @@ export default class Main extends React.Component {
       <ListItem
         ref={React.createRef()}
         style={{ alignSelf: "stretch" }}
-        leftIcon={{type:'evilicon', name: 'user'}}
+        leftIcon={{ type: 'evilicon', name: 'user' }}
         title={item.nome}
         rightTitle={title}
-        rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}       
+        rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}
         bottomDivider={true}
-        topDivider={true}        
+        topDivider={true}
       />
     )
   }
@@ -106,22 +106,22 @@ export default class Main extends React.Component {
     })
   }
 
-  getByName(arr, text) {    
+  getByName(arr, text) {
     let itemRet
-    arr.forEach((item) => {    
-      if (item.nome === text) {    
+    arr.forEach((item) => {
+      if (item.nome === text) {
         itemRet = item
       }
     })
-    
-    return itemRet ?  itemRet :  false
+
+    return itemRet ? itemRet : false
   }
 
-  itemCallback(name){    
+  itemCallback(name) {
     this.props.navigation.navigate('UserScreen', {
       name: name,
       docRef: this.userRef,
-      colRef: this.ref     
+      colRef: this.ref
     })
   }
 
@@ -130,10 +130,10 @@ export default class Main extends React.Component {
       visible: false
     })
 
-    if (data) {      
+    if (data) {
       if (!this.userRef.data().debitos) {
         console.log("Debitos n existe")
-        let debArray = []        
+        let debArray = []
         this.userRef.ref.update({
           debitos: debArray
         }).then(() => {
@@ -144,9 +144,9 @@ export default class Main extends React.Component {
       }
 
       let usr = this.getByName(this.userRef.data().debitos, data.nome)
-      
+
       if (usr) {
-        console.log('user existe')       
+        console.log('user existe')
         let arr = []
         arr = usr.contas
         let deb = this.userRef.data().debitos
@@ -163,7 +163,7 @@ export default class Main extends React.Component {
           contas: arr
         }
         deb.forEach((u, i, a) => {
-          if(u.nome === usr.nome){
+          if (u.nome === usr.nome) {
             a[i] = usr
           }
         })
@@ -199,17 +199,17 @@ export default class Main extends React.Component {
           this.update()
         })
           .catch(e => console.log("ERROR: ", e))
-      }     
+      }
     }
   }
 
-  excluir(i){
+  excluir(i) {
     console.log(i)
-    let array = this.userRef.data().debitos    
+    let array = this.userRef.data().debitos
     let newdebitosArray = []
 
-    array.forEach((item, index) => {      
-      if(index != i){
+    array.forEach((item, index) => {
+      if (index != i) {
         console.log("pushing " + item.nome)
         newdebitosArray.push(item)
       }
@@ -218,12 +218,12 @@ export default class Main extends React.Component {
     this.userRef.ref.update({
       debitos: newdebitosArray
     }).then(() => this.update())
-    .catch(e => console.log(e.message))    
+      .catch(e => console.log(e.message))
   }
 
-  render() {    
-    let view    
-    if(this.state.dados && !this.state.dados.debitos){
+  render() {
+    let view
+    if (this.state.dados && !this.state.dados.debitos) {
       console.log("sem lista")
       view =
         <>
@@ -233,7 +233,7 @@ export default class Main extends React.Component {
               visible={this.state.visible}
             />
             <View style={styles.container}>
-              <Balanco valor={0} showBal={false}/>
+              <Balanco valor={0} showBal={false} />
             </View>
           </View>
           <View style={styles.listContainer}>
@@ -241,47 +241,49 @@ export default class Main extends React.Component {
               type="clear"
               icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
               onPress={() => this.open()}
-              buttonStyle={{height: 70, width: 70, alignSelf: 'flex-end'}}
-            />            
+              buttonStyle={{ height: 70, width: 70, alignSelf: 'flex-end' }}
+            />
           </View>
         </>
     } else if (this.state.dados && this.state.dados.debitos) {
       console.log('com list')
       let value = 0;
       this.state.dados.debitos.forEach((item) => {
-        item.contas.forEach((conta) =>{
-          if(!conta.quitado)
+        item.contas.forEach((conta) => {
+          if (!conta.quitado)
             value = conta.tipo == 'receber' ? value + conta.valor : value - conta.valor
-        })                
+        })
       })
-      
+
       view =
         <>
-          <View style={styles.top}>
-            <OverlayComponent
-              callback={this.modalCallback.bind(this)}
-              visible={this.state.visible}
-            />
-            <View style={styles.container}>
-              <Balanco valor={value} showBal={false}/>
+          <View style={styles.master}>
+            <View style={styles.top}>
+              <OverlayComponent
+                callback={this.modalCallback.bind(this)}
+                visible={this.state.visible}
+              />
+              <View style={styles.container}>
+                <Balanco valor={value} showBal={false} />
+              </View>
             </View>
-          </View>
-          <View style={styles.listContainer}>
-            <Button
-              type="clear"
-              icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
-              onPress={() => this.open()}
-              buttonStyle={{height: 70, width: 70, alignSelf: 'flex-end'}}
-            />
-            <List style={styles.list}data={this.state.dados.debitos} itemCallback={this.itemCallback} excluir={this.excluir.bind(this)}/>
+            <View style={styles.listContainer}>
+              <Button
+                type="clear"
+                icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
+                onPress={() => this.open()}
+                buttonStyle={{ height: 70, width: 70, alignSelf: 'flex-end' }}
+              />
+              <List style={styles.list} data={this.state.dados.debitos} itemCallback={this.itemCallback} excluir={this.excluir.bind(this)} />
+            </View>
           </View>
         </>
     } else {
       console.log('carregando')
       view =
-        <>
-          <ActivityIndicator size="large" />
-        </>
+        <View style={styles.loading}>
+          <ActivityIndicator style={{ alignSelf: "center" }} color="#f5f5f5" size="large" />
+        </View>
     }
 
     return (
@@ -293,21 +295,26 @@ export default class Main extends React.Component {
         angle={90}
         angleCenter={{ x: 0.3, y: 0.3 }}
       >
-        <StatusBar barStyle="light-content" backgroundColor="#0CA2F7"/>
-        <View style={styles.master}>       
-          {view}
-        </View>
+        <StatusBar barStyle="light-content" backgroundColor="#0CA2F7" />        
+        {view}        
       </LinearGradient>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  loading:{
+    flex: 1,
+    alignSelf: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+
   master: {
     flex: 1,
     alignSelf: 'center',
     flexDirection: 'column',
-    
+
   },
   top: {
     height: height * .15,
@@ -331,9 +338,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
-    elevation: 10,            
+    elevation: 10,
   },
-  list:{
+  list: {
     paddingTop: 30,
   }
 })
