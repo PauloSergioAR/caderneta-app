@@ -54,6 +54,7 @@ const OverlayComponent = (props) => {
   const handleSubmit = () => {
     let data = {
       nome:nome,
+      descricao: descricao,
       date: date,
       tipo: combo,
       categoria: categoria,
