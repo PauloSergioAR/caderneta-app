@@ -41,7 +41,10 @@ const OverlayComponent = (props) => {
     setCategoria(e)
   })
 
-  const onValChange = useCallback(e => {
+  const onValChange = useCallback(e => {    
+    if(e.includes(',')){      
+      e = e.replace(/,/g, '.')               
+    }   
     setValor(e)
   })
 
@@ -145,10 +148,11 @@ const OverlayComponent = (props) => {
             onChangeText={(text) => onValChange(text)}
             name="val"
             style={{padding: 10}}
-            keyboardType="decimal-pad"
+            keyboardType="number-pad"
             leftIcon={{type: 'material-community', name: 'cash-multiple'}}
             maxLength={8}
             errorMessage={valorErr}
+            value={valor}
           />
           <View style={styles.buttons}>
             <Button

@@ -21,7 +21,7 @@ export default class Main extends React.Component {
       <Button
         type="clear"
         onPress={() => firebase.auth().signOut()}
-        icon={{ type: 'simple-line-icon', name: 'logout' }}
+        icon={{ type: 'simple-line-icon', name: 'logout', color:'white' }}
       />
     ),
     headerTransparent: true
@@ -32,22 +32,29 @@ export default class Main extends React.Component {
     this.state = {
       currentUser: null,
       visible: false,
-      dados: null
+      dados: null,
+      updating: false
     }
 
     this.ref = firebase.firestore().collection('users')
     this.ref.where('email', "==", firebase.auth().currentUser.email).get().then(snap => {
       snap.forEach(doc => {
-        this.userRef = doc
-      })
+        this.userRef = doc        
+      })            
     })
-
+    
     this.update = this.update.bind(this)
-    this.itemCallback = this.itemCallback.bind(this)
-    this.interval = setInterval(() => {
-      this.update()
-    }, 60000)
 
+    firebase.firestore().collection('users').
+      where('email', '==', firebase.auth().currentUser.email)
+      .onSnapshot(
+        {
+          includeMetadataChanges: true
+        },
+        this.update
+      )
+
+    this.itemCallback = this.itemCallback.bind(this)    
   }
 
   componentDidMount() {
@@ -57,6 +64,7 @@ export default class Main extends React.Component {
   }
 
   update = () => {
+    this.setState({updating: true})
     console.log("Updating")
     let data
     firebase.firestore().collection('users')
@@ -70,6 +78,7 @@ export default class Main extends React.Component {
         })
       }).catch(e => console.log(e))
     this.userRef && console.log(this.userRef.data())
+    this.setState({updating: false})
   }
 
   renderItem = ({ item }, i) => {
@@ -222,6 +231,11 @@ export default class Main extends React.Component {
   }
 
   render() {
+
+    let load = this.state.updating ? 
+    <ActivityIndicator style={{ alignSelf: "center" }} color="#f5f5f5" size="large"/> :
+    <></>
+
     let view
     if (this.state.dados && !this.state.dados.debitos) {
       console.log("sem lista")
@@ -235,6 +249,7 @@ export default class Main extends React.Component {
             <View style={styles.container}>
               <Balanco valor={0} showBal={false} />
             </View>
+            {load}
           </View>
           <View style={styles.listContainer}>
             <Button
@@ -265,7 +280,7 @@ export default class Main extends React.Component {
               />
               <View style={styles.container}>
                 <Balanco valor={value} showBal={false} />
-              </View>
+              </View>              
             </View>
             <View style={styles.listContainer}>
               <Button
@@ -317,9 +332,10 @@ const styles = StyleSheet.create({
 
   },
   top: {
+    flexDirection: 'column',
     height: height * .15,
     marginTop: 30,
-    marginBottom: 20
+    marginBottom: 20.    
   },
   container: {
     flex: 1,

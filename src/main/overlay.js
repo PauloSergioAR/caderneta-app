@@ -43,11 +43,14 @@ const OverlayComponent = (props) => {
     }
   })
 
-  const onCatChange = useCallback(e => {
+  const onCatChange = useCallback(e => {        
     setCategoria(e)
   })
 
-  const onValChange = useCallback(e => {
+  const onValChange = useCallback(e => {    
+    if(e.includes(',')){      
+      e = e.replace(/,/g, '.')               
+    }  
     setValor(e)
   })
 
@@ -173,6 +176,7 @@ const OverlayComponent = (props) => {
             leftIcon={{type: 'material-community', name: 'cash-multiple'}}
             maxLength={8}
             errorMessage={valorErr}
+            value={valor}
           />
           <View style={styles.buttons}>
             <Button

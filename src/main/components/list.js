@@ -20,7 +20,7 @@ const List = (props) => {
 
     let swipeleft = [
       {
-        text: "Exlcuir",
+        text: "Excluir",
         backgroundColor: 'red',
         onPress: () => {          
           props.excluir(index)

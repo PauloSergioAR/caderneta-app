@@ -14,7 +14,7 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class SignUp extends React.Component {
-  state = { email: '', password: '', name: '', nameError: '', emailErr: '', passErr: '', loading: false }
+  state = { email: '', password: '', name: '', nameError: '', emailErr: '', passErr: '', loading: false, errorMessage: null }
 
   handleSignUp = () => {
     this.setState({ loading: true })
@@ -41,7 +41,7 @@ export default class SignUp extends React.Component {
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(() => {
-          this.setState({loading: false})
+          this.setState({ loading: false })
           this.props.navigation.navigate('Stack')
           firebase.firestore().collection('users').add({
             name: this.state.name,
@@ -49,10 +49,11 @@ export default class SignUp extends React.Component {
             debitos: []
           })
         })
-        .catch(error => this.setState({ errorMessage: error.message }))
+        .catch(error => {
+          this.setState({ errorMessage: error.message, loading: false })
+        })
     } else {
       this.setState({
-        errorMessage: errorMessage,
         loading: false
       })
     }
@@ -93,7 +94,14 @@ export default class SignUp extends React.Component {
                   style={{ backgroundColor: '#00C9E1', height: 3, width: 120, borderRadius: 100 }} />
               </View>
             </View>
-
+            {this.state.errorMessage &&
+              <Text 
+                style={{ color: 'red', alignSelf: 'center'}}
+                adjustsFontSizeToFit
+                numberOfLines={1}>
+                {this.state.errorMessage}
+              </Text>
+            }
             <View style={styles.form}>
               <Input
                 containerStyle={styles.textInput}
@@ -164,6 +172,7 @@ const styles = StyleSheet.create({
   form: {
     marginTop: 64,
     width: width * .8,
+    alignSelf: 'center'
   },
 
   center: {

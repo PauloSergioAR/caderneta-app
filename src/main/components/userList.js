@@ -23,7 +23,7 @@ const UserList = (props) => {
   
     let swipeleft = [
       {
-        text: "Exlcuir",
+        text: "Excluir",
         backgroundColor: 'red',
         onPress: () => {
           console.log(index)

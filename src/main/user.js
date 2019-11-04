@@ -44,6 +44,16 @@ export default class User extends Component {
       })
     })
 
+    this.update = this.update.bind(this)
+
+    firebase.firestore().collection('users').
+      where('email', '==', firebase.auth().currentUser.email)
+      .onSnapshot(
+        {
+          includeMetadataChanges: true
+        },
+        this.update
+      )
   }
 
   open() {
@@ -55,9 +65,7 @@ export default class User extends Component {
   excluir(i) {
     let array = this.userRef.data().debitos
     let user
-    let userIndex
-    let conta
-    let contaIndex
+    let userIndex        
 
     let newContasArray = []
 
