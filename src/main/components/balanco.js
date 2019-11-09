@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, Dimensions } from 'react-native';
+
+var width = Dimensions.get('window').width;
+var height = Dimensions.get('window').height;
 
 const Balanco = (props) => {
   
@@ -18,12 +21,12 @@ const styles = StyleSheet.create({
   positive: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: 'green'
+    color: 'white'
   },
   negative: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: 'red'
+    color: 'white'
   },  
 })
 

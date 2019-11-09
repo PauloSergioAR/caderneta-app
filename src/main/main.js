@@ -1,9 +1,12 @@
 import React from 'react'
-import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions, Image, StatusBar } from 'react-native'
 import firebase from 'react-native-firebase';
 import { ListItem, Button, SearchBar } from 'react-native-elements';
 
 import Menu, { MenuItem, Position } from "react-native-enhanced-popup-menu";
+import LinearGradient from 'react-native-linear-gradient';
+
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import OverlayComponent from './overlay'
 import List from './components/list'
@@ -14,53 +17,45 @@ var height = Dimensions.get('window').height;
 
 export default class Main extends React.Component {
   static navigationOptions = {
-    title: 'Home',
     headerLeft: () => (
       <Button
         type="clear"
         onPress={() => firebase.auth().signOut()}
-        icon={{ type: 'simple-line-icon', name: 'logout' }}
+        icon={{ type: 'simple-line-icon', name: 'logout', color:'white' }}
       />
     ),
-    headerRight: () => (
-      <Button
-        type="clear"
-        onPress={() => this.prototype.props.navigation.setParams({
-          headerRigh: () => {
-            <SearchBar
-              placeholder="Type Here..."
-              onChangeText={this.updateSearch}
-              value={"Test"}
-            />
-          }
-        })}
-        icon={{ type: 'material-community', name: 'account-search' }}
-      />
-    )
+    headerTransparent: true
   }
 
   constructor(props) {
     super(props)
     this.state = {
       currentUser: null,
-      visible: false,      
-      dados: null
+      visible: false,
+      dados: null,
+      updating: false
     }
 
     this.ref = firebase.firestore().collection('users')
     this.ref.where('email', "==", firebase.auth().currentUser.email).get().then(snap => {
       snap.forEach(doc => {
-        this.userRef = doc
-      })
+        this.userRef = doc        
+      })            
     })
-   
-    this.update = this.update.bind(this)    
-    this.itemCallback = this.itemCallback.bind(this)
-    this.interval = setInterval(() => {
-      this.update()      
-    }, 60000)
     
-  }  
+    this.update = this.update.bind(this)
+
+    firebase.firestore().collection('users').
+      where('email', '==', firebase.auth().currentUser.email)
+      .onSnapshot(
+        {
+          includeMetadataChanges: true
+        },
+        this.update
+      )
+
+    this.itemCallback = this.itemCallback.bind(this)    
+  }
 
   componentDidMount() {
     const { currentUser } = firebase.auth()
@@ -69,6 +64,7 @@ export default class Main extends React.Component {
   }
 
   update = () => {
+    this.setState({updating: true})
     console.log("Updating")
     let data
     firebase.firestore().collection('users')
@@ -78,9 +74,11 @@ export default class Main extends React.Component {
           this.setState({
             dados: data
           })
-          console.log("Received")          
+          this.userRef = doc
         })
-      }).catch(e => console.log(e))            
+      }).catch(e => console.log(e))
+    this.userRef && console.log(this.userRef.data())
+    this.setState({updating: false})
   }
 
   renderItem = ({ item }, i) => {
@@ -95,12 +93,12 @@ export default class Main extends React.Component {
       <ListItem
         ref={React.createRef()}
         style={{ alignSelf: "stretch" }}
-        leftIcon={{type:'evilicon', name: 'user'}}
+        leftIcon={{ type: 'evilicon', name: 'user' }}
         title={item.nome}
         rightTitle={title}
-        rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}       
+        rightTitleStyle={value > 0 ? styles.listPositive : styles.listNegative}
         bottomDivider={true}
-        topDivider={true}        
+        topDivider={true}
       />
     )
   }
@@ -117,22 +115,22 @@ export default class Main extends React.Component {
     })
   }
 
-  getByName(arr, text) {    
+  getByName(arr, text) {
     let itemRet
-    arr.forEach((item) => {    
-      if (item.nome === text) {    
+    arr.forEach((item) => {
+      if (item.nome === text) {
         itemRet = item
       }
     })
-    
-    return itemRet ?  itemRet :  false
+
+    return itemRet ? itemRet : false
   }
 
-  itemCallback(name){
-    console.log(name)
+  itemCallback(name) {
     this.props.navigation.navigate('UserScreen', {
       name: name,
-      docRef: this.userRef      
+      docRef: this.userRef,
+      colRef: this.ref
     })
   }
 
@@ -141,10 +139,10 @@ export default class Main extends React.Component {
       visible: false
     })
 
-    if (data) {      
+    if (data) {
       if (!this.userRef.data().debitos) {
         console.log("Debitos n existe")
-        let debArray = []        
+        let debArray = []
         this.userRef.ref.update({
           debitos: debArray
         }).then(() => {
@@ -155,9 +153,9 @@ export default class Main extends React.Component {
       }
 
       let usr = this.getByName(this.userRef.data().debitos, data.nome)
-      
+
       if (usr) {
-        console.log('user exite')       
+        console.log('user existe')
         let arr = []
         arr = usr.contas
         let deb = this.userRef.data().debitos
@@ -174,7 +172,7 @@ export default class Main extends React.Component {
           contas: arr
         }
         deb.forEach((u, i, a) => {
-          if(u.nome === usr.nome){
+          if (u.nome === usr.nome) {
             a[i] = usr
           }
         })
@@ -210,20 +208,37 @@ export default class Main extends React.Component {
           this.update()
         })
           .catch(e => console.log("ERROR: ", e))
-      }     
+      }
     }
   }
 
-  render() {    
+  excluir(i) {
+    console.log(i)
+    let array = this.userRef.data().debitos
+    let newdebitosArray = []
+
+    array.forEach((item, index) => {
+      if (index != i) {
+        console.log("pushing " + item.nome)
+        newdebitosArray.push(item)
+      }
+    })
+    console.log(newdebitosArray)
+    this.userRef.ref.update({
+      debitos: newdebitosArray
+    }).then(() => this.update())
+      .catch(e => console.log(e.message))
+  }
+
+  render() {
+
+    let load = this.state.updating ? 
+    <ActivityIndicator style={{ alignSelf: "center" }} color="#f5f5f5" size="large"/> :
+    <></>
+
     let view
-    if (this.state.dados) {
-      let value = 0;
-      this.state.dados.debitos.forEach((item) => {
-        item.contas.forEach((conta) =>{          
-          value = conta.tipo == 'receber' ? value + conta.valor : value - conta.valor
-        })                
-      })
-      console.log(value)
+    if (this.state.dados && !this.state.dados.debitos) {
+      console.log("sem lista")
       view =
         <>
           <View style={styles.top}>
@@ -232,47 +247,102 @@ export default class Main extends React.Component {
               visible={this.state.visible}
             />
             <View style={styles.container}>
-              <Balanco valor={value} showBal={true}/>
+              <Balanco valor={0} showBal={false} />
             </View>
+            {load}
           </View>
           <View style={styles.listContainer}>
             <Button
               type="clear"
-              icon={{ type: 'material-community', name: 'plus-circle-outline' }}
+              icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
               onPress={() => this.open()}
+              buttonStyle={{ height: 70, width: 70, alignSelf: 'flex-end' }}
             />
-            <List data={this.state.dados.debitos} itemCallback={this.itemCallback}/>
+          </View>
+        </>
+    } else if (this.state.dados && this.state.dados.debitos) {
+      console.log('com list')
+      let value = 0;
+      this.state.dados.debitos.forEach((item) => {
+        item.contas.forEach((conta) => {
+          if (!conta.quitado)
+            value = conta.tipo == 'receber' ? value + conta.valor : value - conta.valor
+        })
+      })
+
+      view =
+        <>
+          <View style={styles.master}>
+            <View style={styles.top}>
+              <OverlayComponent
+                callback={this.modalCallback.bind(this)}
+                visible={this.state.visible}
+              />
+              <View style={styles.container}>
+                <Balanco valor={value} showBal={false} />
+              </View>              
+            </View>
+            <View style={styles.listContainer}>
+              <Button
+                type="clear"
+                icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
+                onPress={() => this.open()}
+                buttonStyle={{ height: 70, width: 70, alignSelf: 'flex-end' }}
+              />
+              <List style={styles.list} data={this.state.dados.debitos} itemCallback={this.itemCallback} excluir={this.excluir.bind(this)} />
+            </View>
           </View>
         </>
     } else {
+      console.log('carregando')
       view =
-        <>
-          <ActivityIndicator size="large" />
-        </>
+        <View style={styles.loading}>
+          <ActivityIndicator style={{ alignSelf: "center" }} color="#f5f5f5" size="large" />
+        </View>
     }
 
     return (
-      <View style={styles.master}>       
-        {view}
-      </View>
+      <LinearGradient
+        colors={['#9831F7', '#00C9E1']}
+        style={{ flex: 1 }}
+        start={{ x: 0.7, y: 0.7 }}
+        useAngle={true}
+        angle={90}
+        angleCenter={{ x: 0.3, y: 0.3 }}
+      >
+        <StatusBar barStyle="light-content" backgroundColor="#0CA2F7" />        
+        {view}        
+      </LinearGradient>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  loading:{
+    flex: 1,
+    alignSelf: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+
   master: {
     flex: 1,
     alignSelf: 'center',
     flexDirection: 'column',
+
   },
   top: {
-    height: height * .15
+    flexDirection: 'column',
+    height: height * .15,
+    marginTop: 30,
+    marginBottom: 20.    
   },
   container: {
     flex: 1,
     alignSelf: 'center',
     alignItems: 'center',
-    marginTop: 40
+    marginTop: 50,
+    marginBottom: 20
   },
 
   listContainer: {
@@ -280,6 +350,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'column-reverse',
     width: width * .95,
-    height: 5000,
-  }  
+    height: height,
+    backgroundColor: '#f5f5f5',
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+    elevation: 10,
+  },
+  list: {
+    paddingTop: 30,
+  }
 })

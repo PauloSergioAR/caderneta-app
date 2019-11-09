@@ -10,24 +10,18 @@ import DatePicker from 'react-native-datepicker'
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
-var data={ }
+var data={}
 
-const OverlayComponent = (props) => {
-  const [nome, setNome] = useState('')
+const OverlayComponent = (props) => {    
   const [descricao, setDescricao] = useState('')
   const [date, setDate] = useState(new Date().getDate() + "-" + new Date().getMonth() + "-" + new Date().getFullYear())
   const [combo, setCombo] = useState('0')
   const [categoria, setCategoria] = useState('')
   const [valor, setValor] = useState('')
 
-  const [nomeErr, setNomeErr] = useState('')
-  const [descricaoErr, setDescricaoErr] = useState('')  
   const [comboErr, setComboErr] = useState('0')  
   const [valorErr, setValorErr] = useState('')
-
-  onNomeChange = useCallback(e => {
-    setNome(e)
-  })
+  const [descricaoErr, setDescricaoErr] = useState('')  
 
   const onDescChange = useCallback(e => {
     setDescricao(e)
@@ -43,29 +37,23 @@ const OverlayComponent = (props) => {
     }
   })
 
-  const onCatChange = useCallback(e => {        
+  const onCatChange = useCallback(e => {
     setCategoria(e)
   })
 
   const onValChange = useCallback(e => {    
     if(e.includes(',')){      
       e = e.replace(/,/g, '.')               
-    }  
+    }   
     setValor(e)
   })
 
   const handleCancel = () => {
     props.callback(null)
-
   }
 
   const handleSubmit = () => {
     let err = false
-
-    if(nome === ''){
-      setNomeErr("Nome não pode estar vazio")
-      err = true
-    }      
     if(descricao === ''){
       setDescricaoErr("Descrição não pode estar vazia")
       err = true
@@ -83,54 +71,42 @@ const OverlayComponent = (props) => {
       return
 
     let data = {
-      nome:nome,
-      descricao: descricao,
+      descricao: descricao,     
       date: date,
       tipo: combo,
       categoria: categoria,
       valor: parseFloat(valor)
     }
-
     props.callback(data)
-    data = null
-    setNome('')
+    data = null    
     setCategoria('')
     setCombo('0')
-    setDate(new Date().getDate() + "-" + new Date().getMonth() + "-" + new Date().getFullYear())
+    setDate(new Date().getDate())
     setValor('')
   }
 
   return(
-    <View >
+    <View>
       <Overlay
-          isVisible={props.visible}          
+          isVisible={props.visible}
           animationType={"slide"}
           onBackdropPress={handleCancel}
           fullScreen={true}
         >
           <Text 
             style={{fontSize: 30, fontStyle: 'bold', alignSelf: "center", fontFamily: 'notoserif', color: '#00C9E1'}}>
-              Nova Ficha
+              Novo Débito
           </Text>
-          <Input
-            placeholder="nome"
-            onChangeText={(text) => onNomeChange(text)}
-            style={{padding: 10}}
-            leftIcon={{type: 'evilicon', name: 'user'}}
-            maxLength={20}
-            errorMessage={nomeErr}
-          />
           <Input
             placeholder="Descrição"
             onChangeText={(text) => onDescChange(text)}
             style={{padding: 10}}
             leftIcon={{type: 'simple-line-icon', name: 'note'}}
-            errorMessage={descricaoErr}
             maxLength={20}
-          />
-         
+            errorMessage={descricaoErr}
+          />          
           <DatePicker
-            style={{width: width * .73, padding: 10, alignSelf: 'center'}}            
+            style={{width: width * .73, padding: 10, alignSelf: 'center'}}
             date={date}
             mode="date"
             placeholder={date}
@@ -159,7 +135,7 @@ const OverlayComponent = (props) => {
             <Picker.Item label="A Pagar" value="pagar"/>
             <Picker.Item label="A Receber" value="receber"/>
           </Picker>
-          <Text style={{color: "red"}}>{comboErr != '0' && comboErr}</Text>
+          <Text style={{color: 'red'}}>{comboErr != '0' && comboErr}</Text>
           <Input
             placeholder="Categoria"
             onChangeText={(text) => onCatChange(text)}            
@@ -172,7 +148,7 @@ const OverlayComponent = (props) => {
             onChangeText={(text) => onValChange(text)}
             name="val"
             style={{padding: 10}}
-            keyboardType="decimal-pad"
+            keyboardType="number-pad"
             leftIcon={{type: 'material-community', name: 'cash-multiple'}}
             maxLength={8}
             errorMessage={valorErr}
