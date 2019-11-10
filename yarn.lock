@@ -5631,6 +5631,11 @@ react-native-input-xg@^0.0.2:
   dependencies:
     react-native-stylesheet-xg "^1.1.0"
 
+react-native-iphone-x-helper@^1.0.2:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.2.1.tgz#645e2ffbbb49e80844bb4cbbe34a126fda1e6772"
+  integrity sha512-/VbpIEp8tSNNHIvstuA3Swx610whci1Zpc9mqNkqn14DkMbw+ORviln2u0XyHG1kPvvwTNGZY6QpeFwxYaSdbQ==
+
 react-native-label-select@^1.0.10:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/react-native-label-select/-/react-native-label-select-1.1.0.tgz#9bc7f78acf196b14f69c10d72ce68a02b6889538"
@@ -5660,6 +5665,13 @@ react-native-reanimated@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.4.0.tgz#7f1acbf9be08492d834f512700570978052be2f9"
   integrity sha512-tO7nSNNP+iRLVbkcSS5GXyDBb7tSI02+XuRL3/S39EAr35rnvUy2JfeLUQG+fWSObJjnMVhasUDEUwlENk8IXw==
+
+react-native-responsive-fontsize@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-responsive-fontsize/-/react-native-responsive-fontsize-0.3.0.tgz#62c80dfb35b481986513d85693668e408652f6ce"
+  integrity sha512-Hs0rR1AXKdZNTv8L7jg7C4ynt4C+9XxpPT/wFT5nUiDKXawjMH9zYEktFq73srEVq8pQQZNiYRJXYcj4X26w+w==
+  dependencies:
+    react-native-iphone-x-helper "^1.0.2"
 
 react-native-safe-area-view@^0.14.1:
   version "0.14.8"

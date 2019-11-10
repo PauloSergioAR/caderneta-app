@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Text, StyleSheet, Dimensions } from 'react-native';
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
@@ -19,12 +20,12 @@ const Balanco = (props) => {
 
 const styles = StyleSheet.create({
   positive: {
-    fontSize: 40,
+    fontSize: RFPercentage(5),
     fontWeight: 'bold',
     color: 'white'
   },
   negative: {
-    fontSize: 40,
+    fontSize: RFPercentage(5),
     fontWeight: 'bold',
     color: 'white'
   },  

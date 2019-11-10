@@ -10,6 +10,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import firebase from 'react-native-firebase';
 import { Button } from 'react-native-elements'
 import OverlayComponent from './userOverlay'
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
@@ -201,21 +202,21 @@ export default class User extends Component {
         <View style={styles.master}>
           <View style={styles.top}>
             <View style={styles.user}>
-              <Icon style={styles.icon} name="user" size={60} />
+              <Icon style={styles.icon} name="user" size={height * 0.06} />
               <Text style={styles.username}>{this.state.name}</Text>
             </View>
             <View style={styles.container}>
               <Balanco valor={val} showBal={false} />
             </View>
           </View>
-          <View style={styles.listContainer}>
+          <View style={styles.listContainer}>            
+            {list}
             <Button
               type="clear"
               icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
               onPress={() => this.open()}
               buttonStyle={{ height: 70, width: 70, alignSelf: 'flex-end' }}
             />
-            {list}
           </View>
         </View>
       </LinearGradient>
@@ -232,7 +233,10 @@ const styles = StyleSheet.create({
   },
   top: {
     height: height * .15,
-    marginTop: 45
+    marginTop: height * 0.045,
+    flex: .20,    
+    marginTop: height * 0.03,
+    marginBottom: height * 0.02  
   },
   container: {
     flex: 1,
@@ -242,16 +246,14 @@ const styles = StyleSheet.create({
   },
 
   listContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    flexDirection: 'column-reverse',
-    height: height * .60,
-    marginTop: 55,
+    flex: .80,
+    justifyContent: 'space-around',
+    flexDirection: 'column',
+    width: width * .95,    
     backgroundColor: '#f5f5f5',
-    width: width * .96,
-    borderTopRightRadius: 6,
     borderTopLeftRadius: 6,
-    elevation: 10
+    borderTopRightRadius: 6,
+    elevation: 10,
   },
   user: {
     paddingTop: 15,
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
   },
   username: {
     alignSelf: 'center',
-    fontSize: 40,
+    fontSize: RFPercentage(5),
     color: 'white'
   },
   icon: {

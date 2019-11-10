@@ -32,7 +32,7 @@ const List = (props) => {
       <Swipeout left={swipeleft} backgroundColor="#f5f5f5">
         <ListItem          
           ref={React.createRef()}
-          style={{ alignSelf: "stretch", marginBottom: 2, marginLeft: 10, marginRight: 10, borderRadius: 100, elevation: 10 }}
+          style={styles.list}
           leftIcon={{ type: 'evilicon', name: 'user' }}
           title={item.nome}
           rightTitle={title}
@@ -62,7 +62,18 @@ const styles = StyleSheet.create({
   listPositive: {
     color: 'green'
   },
+
   listNegative: {
     color: 'red'
+  },
+
+  list: { 
+    alignSelf: "stretch", 
+    marginBottom: 2, 
+    marginLeft: 10, 
+    marginRight: 10, 
+    borderRadius: 100, 
+    elevation: 10, 
+    marginTop: height * 0.01
   }
 })

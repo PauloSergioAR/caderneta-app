@@ -282,14 +282,14 @@ export default class Main extends React.Component {
                 <Balanco valor={value} showBal={false} />
               </View>              
             </View>
-            <View style={styles.listContainer}>
-              <Button
+            <View style={styles.listContainer}>              
+              <List  data={this.state.dados.debitos} itemCallback={this.itemCallback} excluir={this.excluir.bind(this)} />
+              <Button                
                 type="clear"
                 icon={{ type: 'material-community', name: 'plus-circle-outline', size: 40 }}
                 onPress={() => this.open()}
-                buttonStyle={{ height: 70, width: 70, alignSelf: 'flex-end' }}
+                buttonStyle={{ height: 70, width: 70, marginBottom: 50, flex:.05, alignSelf: 'flex-end' }}
               />
-              <List style={styles.list} data={this.state.dados.debitos} itemCallback={this.itemCallback} excluir={this.excluir.bind(this)} />
             </View>
           </View>
         </>
@@ -329,14 +329,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
     flexDirection: 'column',
-
   },
+
   top: {
     flexDirection: 'column',
-    height: height * .15,
-    marginTop: 30,
-    marginBottom: 20.    
+    flex: .20,    
+    marginTop: height * 0.03,
+    marginBottom: height * 0.02    
   },
+  
   container: {
     flex: 1,
     alignSelf: 'center',
@@ -346,17 +347,17 @@ const styles = StyleSheet.create({
   },
 
   listContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    flexDirection: 'column-reverse',
-    width: width * .95,
-    height: height,
+    flex: .80,
+    justifyContent: 'space-around',
+    flexDirection: 'column',
+    width: width * .95,    
     backgroundColor: '#f5f5f5',
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
     elevation: 10,
   },
-  list: {
-    paddingTop: 30,
-  }
+
+  list: {    
+    flex: .50
+  },  
 })

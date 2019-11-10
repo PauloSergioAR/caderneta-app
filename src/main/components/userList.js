@@ -38,7 +38,7 @@ const UserList = (props) => {
       <Swipeout left={swipeleft} right={swiperight} backgroundColor="#f5f5f5" autoClose={true}>
         <ListItem        
           ref={React.createRef()}
-          style={{ alignSelf: "stretch", marginBottom: 2, marginLeft: 10, marginRight: 10, borderRadius: 100, elevation: 10 }}
+          style={styles.list}
           leftIcon={item.tipo == 'receber' ? {type:'evilicon', name:'arrow-up'} : {type:'evilicon', name:'arrow-down'}}
           title={item.descricao}
           titleStyle={item.quitado ? {textDecorationLine: 'line-through'} : {textDecorationStyle: 'solid'}}
@@ -76,5 +76,15 @@ const styles = StyleSheet.create({
   },
   listNegative: {
     color: 'red'
+  },
+
+  list: { 
+    alignSelf: "stretch", 
+    marginBottom: 2, 
+    marginLeft: 10, 
+    marginRight: 10, 
+    borderRadius: 100, 
+    elevation: 10, 
+    marginTop: height * 0.01
   }
 })
