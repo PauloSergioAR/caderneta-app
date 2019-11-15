@@ -8,23 +8,35 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
-import OverlayComponent from './overlay'
-import List from './components/list'
-import Balanco from './components/balanco'
+import OverlayComponent from '../../main/components/overlays/overlay'
+import List from '../../main/components/list'
+import Balanco from '../../main/components/balanco'
 
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Main extends React.Component {
-  static navigationOptions = {
-    headerLeft: () => (
-      <Button
-        type="clear"
-        onPress={() => firebase.auth().signOut()}
-        icon={{ type: 'simple-line-icon', name: 'logout', color:'white' }}
-      />
-    ),
-    headerTransparent: true
+  static navigationOptions  = ({ navigation }) => {
+    return (
+      {
+        headerLeft: () => (
+          <Button
+            type="clear"
+            onPress={() => firebase.auth().signOut()}
+            icon={{ type: 'simple-line-icon', name: 'logout', color:'white' }}
+          />
+        ),
+        headerRight: () => (
+          <Button
+            type="clear"
+            onPress={() => navigation.getParam('gotoSearch')()}
+            icon={{type: "ionicon", name: "md-search", color: 'white', size: height * 0.03}}
+          />
+        ),
+    
+        headerTransparent: true
+      }
+    )
   }
 
   constructor(props) {
@@ -61,6 +73,17 @@ export default class Main extends React.Component {
     const { currentUser } = firebase.auth()
     this.setState({ currentUser })
     this.update()
+
+    this.props.navigation.setParams({
+      gotoSearch: this.gotoSearch.bind(this)
+    })
+  }
+
+  gotoSearch(){
+    this.props.navigation.navigate('SearchScreen', {
+      list: this.state.dados.debitos,
+      docRef: this.userRef
+    })
   }
 
   update = () => {
@@ -129,8 +152,7 @@ export default class Main extends React.Component {
   itemCallback(name) {
     this.props.navigation.navigate('UserScreen', {
       name: name,
-      docRef: this.userRef,
-      colRef: this.ref
+      docRef: this.userRef,    
     })
   }
 

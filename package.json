@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "jetifier": "^1.6.4",
+    "lodash": "^4.17.15",
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-datepicker": "^1.7.2",
