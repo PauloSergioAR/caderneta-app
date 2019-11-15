@@ -3,13 +3,12 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, Dimensions, NativeMethodsMixin, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
 
-import List from './components/userList'
-import UserList from './components/userList';
-import Balanco from './components/balanco'
+import UserList from '../../main/components/userList'
+import Balanco from '../../main/components/balanco'
 import LinearGradient from 'react-native-linear-gradient';
 import firebase from 'react-native-firebase';
 import { Button } from 'react-native-elements'
-import OverlayComponent from './userOverlay'
+import OverlayComponent from '../../main/components/overlays/userOverlay'
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 
 var width = Dimensions.get('window').width;
@@ -28,8 +27,7 @@ export default class User extends Component {
     let dadosusr
     this.docRef.data().debitos.forEach((item) => {
       if (item.nome === name)
-        dadosusr = item
-      return
+        dadosusr = item      
     })
     this.state = {
       name: name,

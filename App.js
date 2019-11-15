@@ -5,8 +5,9 @@ import { SwitchNavigator, createSwitchNavigator, createAppContainer } from 'reac
 import Loading from './src/screens/loading/loading'
 import SignUp from './src/screens/signup/signup'
 import Login from './src/screens/login/login'
-import Main from './src/main/main'
-import User from './src/main/user'
+import Main from './src/screens/main/main'
+import User from './src/screens/user/user'
+import Search from './src/screens/search/search'
 
 
 
@@ -16,7 +17,8 @@ import { createStackNavigator } from 'react-navigation-stack';
 const Stack = createStackNavigator(
   {
     MainScreen: Main,
-    UserScreen: User
+    UserScreen: User,
+    SearchScreen: Search
   }, {
     transparentCard: true,
     headerTranparent: true
@@ -24,8 +26,7 @@ const Stack = createStackNavigator(
 
 const App = createAppContainer(
   createSwitchNavigator({
-    Loading: Loading,
-    //Auth: Auth,
+    Loading: Loading,    
     SignUp: SignUp,
     Login: Login,
     Stack: Stack
