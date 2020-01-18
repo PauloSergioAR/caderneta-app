@@ -48,8 +48,6 @@ export default class Search extends Component {
     const formatQuery = text.toLowerCase()
 
     const data = _.filter(this.state.list, (user, index) => {      
-      console.log(formatQuery)
-
       if(user.nome.includes(text) || user.nome.toLowerCase().includes(text)){        
         return user
       }      

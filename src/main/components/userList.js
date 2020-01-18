@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 
 import { View, FlatList, Dimensions, StyleSheet } from 'react-native';
 import { ListItem, Button, SearchBar } from 'react-native-elements';
@@ -9,6 +9,18 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 const UserList = (props) => {
+  const [dimensions, setDimenstions] =  useState({width: Dimensions.get('window').width, height: Dimensions.get('window').height})
+
+  useEffect(() => {
+    Dimensions.addEventListener('change', onDimensionsChange)
+  }, [])
+  
+
+  function onDimensionsChange(){
+    setDimenstions({
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height})
+  }
 
   function renderItens (item, index)  {
     let swiperight = [      
@@ -25,15 +37,13 @@ const UserList = (props) => {
       {
         text: "Excluir",
         backgroundColor: 'red',
-        onPress: () => {
-          console.log(index)
+        onPress: () => {          
           props.excluir(index)
         } 
       }
     ]
 
-    title = "R$ " + item.valor.toFixed(2)        
-    console.log(item.tipo)
+    title = "R$ " + item.valor.toFixed(2)    
     return (
       <Swipeout left={swipeleft} right={swiperight} backgroundColor="#f5f5f5" autoClose={true}>
         <ListItem        

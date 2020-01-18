@@ -12,7 +12,34 @@ var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
 export default class Login extends React.Component {
-  state = { email: '', password: '', emailErr: '', passErr: '', loading: false, errorMessage: null }
+
+  constructor(props){
+    super(props)
+    
+    this.state = {
+      email: '',
+      password: '',
+      emailErr: '',
+      passErr: '',
+      loading: false,
+      errorMessage: null,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height
+    }
+
+    Dimensions.addEventListener('change', )
+  }
+
+  onDimensionsChange(){
+    this.setState({
+      ...this.state,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height
+    })
+
+    width = Dimensions.get('window').width,
+    height = Dimensions.get('window').height
+  }
 
   handleLogin = () => {
     this.setState({ loading: true })
@@ -44,8 +71,7 @@ export default class Login extends React.Component {
         })
     } else {
       this.setState({ errorMessage: errorMessage, loading: false })
-    }
-    console.log('handleLogin')
+    }    
   }
   render() {
 

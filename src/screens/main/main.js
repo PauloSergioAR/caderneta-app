@@ -1,12 +1,9 @@
 import React from 'react'
-import { StyleSheet, Text, View, ActivityIndicator, FlatList, Dimensions, Image, StatusBar } from 'react-native'
+import { StyleSheet, View, ActivityIndicator, Dimensions, StatusBar } from 'react-native'
 import firebase from 'react-native-firebase';
-import { ListItem, Button, SearchBar } from 'react-native-elements';
+import { ListItem, Button } from 'react-native-elements';
 
-import Menu, { MenuItem, Position } from "react-native-enhanced-popup-menu";
 import LinearGradient from 'react-native-linear-gradient';
-
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import OverlayComponent from '../../main/components/overlays/overlay'
 import List from '../../main/components/list'
@@ -45,7 +42,9 @@ export default class Main extends React.Component {
       currentUser: null,
       visible: false,
       dados: null,
-      updating: false
+      updating: false,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height
     }
 
     this.ref = firebase.firestore().collection('users')
@@ -67,6 +66,19 @@ export default class Main extends React.Component {
       )
 
     this.itemCallback = this.itemCallback.bind(this)    
+
+    Dimensions.addEventListener('change', this.onDimensionsChange.bind(this))
+  }
+
+  onDimensionsChange(){
+    this.setState({
+      ...this.state,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height
+    })
+
+    width = Dimensions.get('window').width,
+    height = Dimensions.get('window').height
   }
 
   componentDidMount() {
@@ -87,10 +99,9 @@ export default class Main extends React.Component {
   }
 
   update = () => {
-    this.setState({updating: true})
-    console.log("Updating")
+    this.setState({updating: true})    
     let data
-    firebase.firestore().collection('users')
+    firebase.auth().currentUser && firebase.firestore().collection('users')
       .where("email", "==", firebase.auth().currentUser.email).get().then((snap) => {
         snap.forEach((doc) => {
           data = doc.data()
@@ -99,8 +110,7 @@ export default class Main extends React.Component {
           })
           this.userRef = doc
         })
-      }).catch(e => console.log(e))
-    this.userRef && console.log(this.userRef.data())
+      }).catch(e => console.log(e))    
     this.setState({updating: false})
   }
 
@@ -282,8 +292,7 @@ export default class Main extends React.Component {
             />
           </View>
         </>
-    } else if (this.state.dados && this.state.dados.debitos) {
-      console.log('com list')
+    } else if (this.state.dados && this.state.dados.debitos) {      
       let value = 0;
       this.state.dados.debitos.forEach((item) => {
         item.contas.forEach((conta) => {

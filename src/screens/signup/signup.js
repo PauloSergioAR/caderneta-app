@@ -1,20 +1,45 @@
-import React from 'react'
-import {
-  StyleSheet, Text, TextInput, View, Image,
-  Dimensions, Keyboard, ImageBackground, StatusBar, ActivityIndicator
-} from 'react-native'
+import React, { useState } from 'react'
+import { StyleSheet, Text, View, Dimensions, StatusBar, ActivityIndicator } from 'react-native'
 import { Button } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 
 import { Input } from 'react-native-elements'
 import LinearGradient from 'react-native-linear-gradient';
-import { string } from 'prop-types';
 
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
-export default class SignUp extends React.Component {
-  state = { email: '', password: '', name: '', nameError: '', emailErr: '', passErr: '', loading: false, errorMessage: null }
+export default class SignUp extends React.Component {  
+
+  constructor(props){
+    super(props)
+
+    this.state = {
+      email: '',
+      password: '',
+      name: '',
+      nameError: '',
+      emailErr: '',
+      passErr: '',
+      loading: false,
+      errorMessage: null,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height
+    }
+
+    Dimensions.addEventListener('change', this.onDimensionsChange.bind(this))
+  }  
+
+  onDimensionsChange(){
+    this.setState({
+      ...this.state,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height
+    })
+
+    width = Dimensions.get('window').width
+    height = Dimensions.get('window').height
+  }
 
   handleSignUp = () => {
     this.setState({ loading: true })
