@@ -1,6 +1,5 @@
 import React from 'react'
 import { StyleSheet, View, ActivityIndicator, Dimensions, StatusBar } from 'react-native'
-import firebase from 'react-native-firebase';
 import { ListItem, Button } from 'react-native-elements';
 
 import LinearGradient from 'react-native-linear-gradient';
@@ -12,17 +11,12 @@ import Balanco from '../../main/components/balanco'
 var width = Dimensions.get('window').width;
 var height = Dimensions.get('window').height;
 
+const { getTransactions } = require('../../data_utils/connection')
+
 export default class Main extends React.Component {
   static navigationOptions  = ({ navigation }) => {
     return (
-      {
-        headerLeft: () => (
-          <Button
-            type="clear"
-            onPress={() => firebase.auth().signOut()}
-            icon={{ type: 'simple-line-icon', name: 'logout', color:'white' }}
-          />
-        ),
+      {        
         headerRight: () => (
           <Button
             type="clear"
@@ -39,31 +33,9 @@ export default class Main extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      currentUser: null,
-      visible: false,
-      dados: null,
-      updating: false,
       width: Dimensions.get('window').width,
       height: Dimensions.get('window').height
-    }
-
-    this.ref = firebase.firestore().collection('users')
-    this.ref.where('email', "==", firebase.auth().currentUser.email).get().then(snap => {
-      snap.forEach(doc => {
-        this.userRef = doc        
-      })            
-    })
-    
-    this.update = this.update.bind(this)
-
-    firebase.firestore().collection('users').
-      where('email', '==', firebase.auth().currentUser.email)
-      .onSnapshot(
-        {
-          includeMetadataChanges: true
-        },
-        this.update
-      )
+    }    
 
     this.itemCallback = this.itemCallback.bind(this)    
 
@@ -82,36 +54,15 @@ export default class Main extends React.Component {
   }
 
   componentDidMount() {
-    const { currentUser } = firebase.auth()
-    this.setState({ currentUser })
-    this.update()
-
+    getTransactions('paulo.sergio.ar@gmail.com')
     this.props.navigation.setParams({
       gotoSearch: this.gotoSearch.bind(this)
     })
   }
 
   gotoSearch(){
-    this.props.navigation.navigate('SearchScreen', {
-      list: this.state.dados.debitos,
-      docRef: this.userRef
-    })
-  }
-
-  update = () => {
-    this.setState({updating: true})    
-    let data
-    firebase.auth().currentUser && firebase.firestore().collection('users')
-      .where("email", "==", firebase.auth().currentUser.email).get().then((snap) => {
-        snap.forEach((doc) => {
-          data = doc.data()
-          this.setState({
-            dados: data
-          })
-          this.userRef = doc
-        })
-      }).catch(e => console.log(e))    
-    this.setState({updating: false})
+    //The seccond param is an object that retrieves the data
+    this.props.navigation.navigate('SearchScreen')
   }
 
   renderItem = ({ item }, i) => {
@@ -170,96 +121,10 @@ export default class Main extends React.Component {
     this.setState({
       visible: false
     })
-
-    if (data) {
-      if (!this.userRef.data().debitos) {
-        console.log("Debitos n existe")
-        let debArray = []
-        this.userRef.ref.update({
-          debitos: debArray
-        }).then(() => {
-          console.log("Added successfully")
-          this.update()
-        })
-          .catch(e => console.log("ERROR: ", e))
-      }
-
-      let usr = this.getByName(this.userRef.data().debitos, data.nome)
-
-      if (usr) {
-        console.log('user existe')
-        let arr = []
-        arr = usr.contas
-        let deb = this.userRef.data().debitos
-
-        arr.push({
-          categoria: data.categoria,
-          date: data.date,
-          descricao: data.descricao,
-          tipo: data.tipo,
-          valor: data.valor
-        })
-        usr = {
-          ...usr,
-          contas: arr
-        }
-        deb.forEach((u, i, a) => {
-          if (u.nome === usr.nome) {
-            a[i] = usr
-          }
-        })
-        this.userRef.ref.update({
-          debitos: deb
-        }).then(() => {
-          console.log("Added successfully")
-          this.update()
-        })
-          .catch(e => console.log("ERROR: ", e))
-      } else {
-        console.log("user n existe")
-        let usr = {
-          nome: data.nome,
-          contas: [
-            {
-              categoria: data.categoria,
-              date: data.date,
-              descricao: data.descricao,
-              tipo: data.tipo,
-              valor: data.valor
-            },
-          ]
-        }
-
-        let arr = this.userRef.data().debitos
-        arr.push(usr)
-
-        this.userRef.ref.update({
-          debitos: arr
-        }).then(() => {
-          console.log("Added successfully")
-          this.update()
-        })
-          .catch(e => console.log("ERROR: ", e))
-      }
-    }
   }
 
   excluir(i) {
-    console.log(i)
-    let array = this.userRef.data().debitos
-    let newdebitosArray = []
-
-    array.forEach((item, index) => {
-      if (index != i) {
-        console.log("pushing " + item.nome)
-        newdebitosArray.push(item)
-      }
-    })
-    console.log(newdebitosArray)
-    this.userRef.ref.update({
-      debitos: newdebitosArray
-    }).then(() => this.update())
-      .catch(e => console.log(e.message))
+   
   }
 
   render() {

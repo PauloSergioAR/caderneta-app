@@ -1,15 +1,12 @@
 import React from 'react'
-import { StyleSheet, Platform, Image, Text, View } from 'react-native'
-import { SwitchNavigator, createSwitchNavigator, createAppContainer } from 'react-navigation'
+import {createSwitchNavigator, createAppContainer } from 'react-navigation'
 
-import Loading from './src/screens/loading/loading'
-import SignUp from './src/screens/signup/signup'
-import Login from './src/screens/login/login'
+import Loading from './src/screens/login_flow/loading/loading'
+import Login from './src/screens/login_flow/login/login'
+import Tag from './src/screens/login_flow/tag/tag'
 import Main from './src/screens/main/main'
 import User from './src/screens/user/user'
 import Search from './src/screens/search/search'
-
-
 
 import { createStackNavigator } from 'react-navigation-stack';
 
@@ -26,9 +23,9 @@ const Stack = createStackNavigator(
 
 const App = createAppContainer(
   createSwitchNavigator({
-    Loading: Loading,    
-    SignUp: SignUp,
+    Loading: Loading,        
     Login: Login,
+    Tag: Tag,
     Stack: Stack
   },
     {
@@ -37,8 +34,4 @@ const App = createAppContainer(
   )
 )
 
-
 export default App
-
-// SignUp: SignUp,
-// Login: Login,
